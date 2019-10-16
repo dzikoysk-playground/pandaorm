@@ -1,5 +1,5 @@
 # Panda ORM
-Object-Relational Mapping extracted from Panda project 
+Object-Relational Mapping extracted from [Panda](https://github.com/panda-lang/panda) project 
 
 #### Example
 ```java
