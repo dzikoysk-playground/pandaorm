@@ -20,10 +20,10 @@ import java.util.List;
 
 final class ProxyQueryCategory implements DataQueryCategory {
 
-    private final org.panda_lang.autodata.data.query.DataQueryCategoryType type;
-    private final List<? extends org.panda_lang.autodata.data.query.DataQueryRuleScheme> elements;
+    private final DataQueryCategoryType type;
+    private final List<? extends DataQueryRuleScheme> elements;
 
-    ProxyQueryCategory(DataQueryCategoryType type, List<? extends org.panda_lang.autodata.data.query.DataQueryRuleScheme> elements) {
+    ProxyQueryCategory(DataQueryCategoryType type, List<? extends DataQueryRuleScheme> elements) {
         this.type = type;
         this.elements = elements;
     }

@@ -30,7 +30,7 @@ import java.util.Optional;
 
 final class MethodModelLoader {
 
-    protected org.panda_lang.autodata.data.entity.MethodModel load(Map<String, org.panda_lang.autodata.data.entity.Property> properties, Method method) {
+    protected MethodModel load(Map<String, Property> properties, Method method) {
         List<String> elements = CamelCaseUtils.split(method.getName(), String::toLowerCase);
 
         String propertyName = ContentJoiner.on("_").join(elements.subList(1, elements.size())).toString();
@@ -60,16 +60,16 @@ final class MethodModelLoader {
 
                 Association association = associationValue.get();
 
-                org.panda_lang.autodata.data.entity.Property property = new org.panda_lang.autodata.data.entity.Property(propertyName, association.type(), annotations);
+                Property property = new Property(propertyName, association.type(), annotations);
                 properties.put(propertyName, property);
 
-                return new org.panda_lang.autodata.data.entity.MethodModel(method, operationType, property);
+                return new MethodModel(method, operationType, property);
             }
 
-            org.panda_lang.autodata.data.entity.Property property = new org.panda_lang.autodata.data.entity.Property(propertyName, propertyType, annotations);
+            Property property = new Property(propertyName, propertyType, annotations);
             properties.put(propertyName, property);
 
-            return new org.panda_lang.autodata.data.entity.MethodModel(method, operationType, property);
+            return new MethodModel(method, operationType, property);
         }
 
         Property cachedProperty = properties.get(propertyName);

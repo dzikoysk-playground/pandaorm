@@ -31,8 +31,8 @@ public class Transaction<T> implements DataTransaction {
     protected final Runnable transactionContent;
     protected final Supplier<List<DataModification>> modificationSupplier;
     protected DataTransactionCondition retry;
-    protected org.panda_lang.autodata.data.transaction.DataTransactionAction success;
-    protected org.panda_lang.autodata.data.transaction.DataTransactionAction orElse;
+    protected DataTransactionAction success;
+    protected DataTransactionAction orElse;
 
     public Transaction(DataHandler<T> handler, T entity, @Nullable Runnable transactionContent, Supplier<List<DataModification>> modificationSupplier) {
         this.entity = entity;
@@ -48,7 +48,7 @@ public class Transaction<T> implements DataTransaction {
     }
 
     @Override
-    public DataTransaction success(org.panda_lang.autodata.data.transaction.DataTransactionAction success) {
+    public DataTransaction success(DataTransactionAction success) {
         this.success = success;
         return this;
     }

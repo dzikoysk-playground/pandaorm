@@ -33,19 +33,19 @@ final class ProxyMethodGenerator {
 
     private static final DataQueryFactory QUERY_FACTORY = new DataQueryFactory();
 
-    protected org.panda_lang.autodata.data.repository.ProxyMethod generateMethod(org.panda_lang.autodata.data.repository.DataController controller, DataCollection collection, org.panda_lang.autodata.data.repository.RepositoryModel repositoryModel, Method method) {
+    protected ProxyMethod generateMethod(DataController controller, DataCollection collection, RepositoryModel repositoryModel, Method method) {
         List<String> elements = CamelCaseUtils.split(method.getName(), String::toLowerCase);
-        org.panda_lang.autodata.data.repository.RepositoryOperation operation = org.panda_lang.autodata.data.repository.RepositoryOperation.of(elements.get(0));
+        RepositoryOperation operation = RepositoryOperation.of(elements.get(0));
 
         if (operation == null) {
             throw new AutomatedDataException("Unknown operation: '" + elements.get(0) + "' (source: " + method.toGenericString() + ")");
         }
 
-        return new org.panda_lang.autodata.data.repository.ProxyMethod(operation, generate(controller, collection, repositoryModel, method, operation));
+        return new ProxyMethod(operation, generate(controller, collection, repositoryModel, method, operation));
     }
 
     private MethodFunction generate(DataController controller, DataCollection collection, RepositoryModel repositoryModel, Method method, RepositoryOperation operation) {
-        org.panda_lang.autodata.data.repository.DataHandler handler = controller.getHandler(collection.getName());
+        DataHandler handler = controller.getHandler(collection.getName());
         EntityModel entityModel = repositoryModel.getCollectionScheme().getEntityModel();
 
         switch (operation) {
@@ -60,12 +60,12 @@ final class ProxyMethodGenerator {
         }
     }
 
-    private MethodFunction createFunction(org.panda_lang.autodata.data.repository.DataHandler handler) {
+    private MethodFunction createFunction(DataHandler handler) {
         return handler::create;
     }
 
     @SuppressWarnings("unchecked")
-    private MethodFunction deleteFunction(org.panda_lang.autodata.data.repository.DataHandler handler) {
+    private MethodFunction deleteFunction(DataHandler handler) {
         return parameters -> {
             ArrayUtils.forEachThrowing(parameters, (ThrowingConsumer<Object, Exception>) handler::delete);
             return null;

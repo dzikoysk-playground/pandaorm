@@ -22,8 +22,8 @@ import org.panda_lang.autodata.data.repository.RepositoryModel;
 
 public final class EntityFactory {
 
-    private static final org.panda_lang.autodata.data.entity.EntityModelLoader ENTITY_SCHEME_LOADER = new org.panda_lang.autodata.data.entity.EntityModelLoader();
-    private static final org.panda_lang.autodata.data.entity.EntityGenerator ENTITY_GENERATOR = new org.panda_lang.autodata.data.entity.EntityGenerator();
+    private static final EntityModelLoader ENTITY_SCHEME_LOADER = new EntityModelLoader();
+    private static final EntityGenerator ENTITY_GENERATOR = new EntityGenerator();
 
     public EntityModel createEntityScheme(Class<?> entityClass) {
         return ENTITY_SCHEME_LOADER.load(entityClass);

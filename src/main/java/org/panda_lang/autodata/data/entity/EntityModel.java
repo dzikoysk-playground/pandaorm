@@ -23,16 +23,16 @@ import java.util.Optional;
 public class EntityModel {
 
     private final Class<?> rootClass;
-    private final Map<String, org.panda_lang.autodata.data.entity.Property> properties;
-    private final Collection<org.panda_lang.autodata.data.entity.MethodModel> methods;
+    private final Map<String, Property> properties;
+    private final Collection<MethodModel> methods;
 
-    EntityModel(Class<?> rootClass, Map<String, org.panda_lang.autodata.data.entity.Property> properties, Collection<org.panda_lang.autodata.data.entity.MethodModel> methods) {
+    EntityModel(Class<?> rootClass, Map<String, Property> properties, Collection<MethodModel> methods) {
         this.rootClass = rootClass;
         this.properties = properties;
         this.methods = methods;
     }
 
-    public Optional<org.panda_lang.autodata.data.entity.Property> getProperty(String name) {
+    public Optional<Property> getProperty(String name) {
         return Optional.ofNullable(properties.get(name));
     }
 

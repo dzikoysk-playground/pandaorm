@@ -46,7 +46,7 @@ public class CollectionModel {
     }
 
     public static CollectionModel of(DataCollectionStereotype collectionStereotype) {
-        return new org.panda_lang.autodata.data.collection.CollectionModelLoader().load(collectionStereotype);
+        return new CollectionModelLoader().load(collectionStereotype);
     }
 
 }

@@ -16,6 +16,9 @@
 
 package org.panda_lang.autodata.defaults.virtual;
 
+import org.panda_lang.autodata.AutomatedDataException;
+import org.panda_lang.autodata.data.collection.DataCollection;
+import org.panda_lang.autodata.data.entity.Property;
 import org.panda_lang.autodata.data.query.DataQuery;
 import org.panda_lang.autodata.data.query.DataQueryCategoryType;
 import org.panda_lang.autodata.data.query.DataQueryRule;
@@ -23,12 +26,10 @@ import org.panda_lang.autodata.data.query.DataQueryRuleScheme;
 import org.panda_lang.autodata.data.query.DataRuleProperty;
 import org.panda_lang.autodata.data.repository.DataHandler;
 import org.panda_lang.autodata.data.transaction.DataTransactionResult;
-import org.panda_lang.autodata.AutomatedDataException;
-import org.panda_lang.autodata.data.collection.DataCollection;
-import org.panda_lang.autodata.data.entity.Property;
 import org.panda_lang.autodata.orm.GenerationStrategy;
 import org.panda_lang.utilities.commons.ArrayUtils;
 import org.panda_lang.utilities.commons.ClassUtils;
+import org.panda_lang.utilities.commons.ObjectUtils;
 import org.panda_lang.utilities.commons.collection.Lists;
 import org.panda_lang.utilities.commons.collection.Pair;
 
@@ -40,7 +41,7 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-final class InMemoryDataHandler<T> implements org.panda_lang.autodata.data.repository.DataHandler<T> {
+final class InMemoryDataHandler<T> implements DataHandler<T> {
 
     private static final AtomicInteger ID = new AtomicInteger();
 
@@ -65,19 +66,17 @@ final class InMemoryDataHandler<T> implements org.panda_lang.autodata.data.repos
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public <R> R generate(Class<R> requestedType, GenerationStrategy strategy) {
-        return (R) UUID.randomUUID();
+        return ObjectUtils.cast(UUID.randomUUID());
     }
 
     @Override
-    public void save(DataTransactionResult<T> transaction) throws Exception {
+    public void save(DataTransactionResult<T> transaction) {
         transaction.getSuccessAction().ifPresent(action -> action.accept(0, 0));
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public Object find(DataQuery query, Object[] values) throws Exception {
+    public <QUERY> QUERY find(DataQuery<QUERY> query, Object[] values) {
         List<Object> data = null;
 
         for (DataQueryRuleScheme scheme : query.getCategory(DataQueryCategoryType.BY).getElements()) {
@@ -117,14 +116,14 @@ final class InMemoryDataHandler<T> implements org.panda_lang.autodata.data.repos
         }
 
         if (query.getExpectedReturnType().isAssignableFrom(data.getClass())) {
-            return data;
+            return ObjectUtils.cast(data);
         }
 
         if (Optional.class.isAssignableFrom(query.getExpectedReturnType())) {
-            return Optional.ofNullable(Lists.get(data, 0));
+            return ObjectUtils.cast(Optional.ofNullable(Lists.get(data, 0)));
         }
 
-        return data.get(0);
+        return ObjectUtils.cast(data.get(0));
     }
 
     @Override

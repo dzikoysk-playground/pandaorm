@@ -28,7 +28,7 @@ public final class DataCollectionStereotype {
         this.content = builder;
     }
 
-    public Class<? extends org.panda_lang.autodata.data.repository.DataRepository> getRepositoryClass() {
+    public Class<? extends DataRepository> getRepositoryClass() {
         return content.repositoryClass;
     }
 
@@ -36,7 +36,7 @@ public final class DataCollectionStereotype {
         return content.serviceClass;
     }
 
-    public Class<? extends org.panda_lang.autodata.data.entity.DataEntity> getEntityClass() {
+    public Class<? extends DataEntity> getEntityClass() {
         return content.entityClass;
     }
 
@@ -44,7 +44,7 @@ public final class DataCollectionStereotype {
         return content.name;
     }
 
-    public static DataCollectionStereotypeBuilder builder(org.panda_lang.autodata.AutomatedDataSpaceCreator creator) {
+    public static DataCollectionStereotypeBuilder builder(AutomatedDataSpaceCreator creator) {
         return new DataCollectionStereotypeBuilder(creator);
     }
 
@@ -53,11 +53,11 @@ public final class DataCollectionStereotype {
         private final org.panda_lang.autodata.AutomatedDataSpaceCreator creator;
 
         protected String name;
-        protected Class<? extends org.panda_lang.autodata.data.entity.DataEntity> entityClass;
+        protected Class<? extends DataEntity> entityClass;
         protected Class<?> serviceClass;
-        protected Class<? extends org.panda_lang.autodata.data.repository.DataRepository> repositoryClass;
+        protected Class<? extends DataRepository> repositoryClass;
 
-        private DataCollectionStereotypeBuilder(org.panda_lang.autodata.AutomatedDataSpaceCreator creator) {
+        private DataCollectionStereotypeBuilder(AutomatedDataSpaceCreator creator) {
             this.creator = creator;
         }
 

@@ -34,9 +34,9 @@ import java.util.stream.Collectors;
 final class AutomatedDataSpaceInitializer {
 
     private static final CollectionFactory COLLECTION_FACTORY = new CollectionFactory();
-    private static final org.panda_lang.autodata.data.repository.RepositoryFactory REPOSITORY_FACTORY = new RepositoryFactory();
+    private static final RepositoryFactory REPOSITORY_FACTORY = new RepositoryFactory();
 
-    private final org.panda_lang.autodata.AutomatedDataSpace automatedDataSpace;
+    private final AutomatedDataSpace automatedDataSpace;
     private final Injector injector;
 
     AutomatedDataSpaceInitializer(AutomatedDataSpace automatedDataSpace, Injector injector) {
@@ -64,7 +64,7 @@ final class AutomatedDataSpaceInitializer {
         Collection<CollectionModel> collectionModels = initializeSchemes(stereotypes);
         automatedDataSpace.getController().initializeSchemes(collectionModels);
 
-        Collection<org.panda_lang.autodata.data.repository.RepositoryModel> repositoryModels = initializeRepositories(collectionModels);
+        Collection<RepositoryModel> repositoryModels = initializeRepositories(collectionModels);
         injector.getResources().annotatedWith(Berry.class).assignHandler(initializeBerry(repositoryModels));
 
         Collection<? extends DataCollection> collections = createCollections(repositoryModels);
@@ -79,19 +79,19 @@ final class AutomatedDataSpaceInitializer {
                 .collect(Collectors.toList());
     }
 
-    private Collection<org.panda_lang.autodata.data.repository.RepositoryModel> initializeRepositories(Collection<? extends CollectionModel> schemes) {
+    private Collection<RepositoryModel> initializeRepositories(Collection<? extends CollectionModel> schemes) {
         return schemes.stream()
                 .map(scheme -> REPOSITORY_FACTORY.createRepositoryScheme(injector, scheme))
                 .collect(Collectors.toList());
     }
 
-    private BiFunction<Class<?>, Berry, ?> initializeBerry(Collection<org.panda_lang.autodata.data.repository.RepositoryModel> repositoryModels) {
+    private BiFunction<Class<?>, Berry, ?> initializeBerry(Collection<RepositoryModel> repositoryModels) {
         return (type, berry) -> {
-            if (org.panda_lang.autodata.data.repository.DataRepository.class.isAssignableFrom(type)) {
+            if (DataRepository.class.isAssignableFrom(type)) {
                 Optional<? extends DataRepository<?>> dataRepository = repositoryModels.stream()
                         .filter(repositoryScheme -> repositoryScheme.getCollectionScheme().getName().equals(berry.value()))
                         .findFirst()
-                        .map(org.panda_lang.autodata.data.repository.RepositoryModel::getRepository);
+                        .map(RepositoryModel::getRepository);
 
                 if (!dataRepository.isPresent()) {
                     throw new AutomatedDataException("Cannot resolve collection '" + berry.value() + "'");

@@ -16,10 +16,10 @@
 
 package org.panda_lang.autodata.defaults.virtual;
 
+import org.panda_lang.autodata.data.collection.CollectionModel;
+import org.panda_lang.autodata.data.collection.DataCollection;
 import org.panda_lang.autodata.data.repository.DataController;
 import org.panda_lang.autodata.data.repository.DataHandler;
-import org.panda_lang.autodata.data.collection.DataCollection;
-import org.panda_lang.autodata.data.collection.CollectionModel;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -43,7 +43,7 @@ public final class InMemoryDataController implements DataController {
 
     @Override
     @SuppressWarnings("unchecked")
-    public <ENTITY> org.panda_lang.autodata.data.repository.DataHandler<ENTITY> getHandler(String collection) {
+    public <ENTITY> DataHandler<ENTITY> getHandler(String collection) {
         return (DataHandler<ENTITY>) handlers.get(collection);
     }
 

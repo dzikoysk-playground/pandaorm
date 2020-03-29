@@ -25,10 +25,10 @@ import java.util.Map;
 
 public final class AutomatedDataSpace implements DataSpace {
 
-    private final org.panda_lang.autodata.data.repository.DataController controller;
+    private final DataController controller;
     private final Map<String, DataCollection> collections = new HashMap<>();
 
-    AutomatedDataSpace(org.panda_lang.autodata.data.repository.DataController controller) {
+    AutomatedDataSpace(DataController controller) {
         this.controller = controller;
     }
 
@@ -41,7 +41,7 @@ public final class AutomatedDataSpace implements DataSpace {
         return this.collections.get(collectionName);
     }
 
-    protected org.panda_lang.autodata.data.repository.DataController getController() {
+    protected DataController getController() {
         return controller;
     }
 

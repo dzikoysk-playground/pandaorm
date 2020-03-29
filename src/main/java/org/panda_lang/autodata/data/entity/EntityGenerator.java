@@ -108,7 +108,7 @@ final class EntityGenerator {
                 .map(property -> Maps.immutableEntryOf(property, property.getAnnotations().getAnnotation(Generated.class)))
                 .filter(entry -> entry.getValue().isPresent())
                 .forEach(entry -> {
-                    org.panda_lang.autodata.data.entity.Property property = entry.getKey();
+                    Property property = entry.getKey();
                     GenerationStrategy strategy = entry.getValue().get().strategy();
 
                     bodyBuilder

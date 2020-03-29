@@ -21,7 +21,7 @@ import java.util.Optional;
 
 final class TransactionResult<T> implements DataTransactionResult<T> {
 
-    private final org.panda_lang.autodata.data.transaction.Transaction<T> transaction;
+    private final Transaction<T> transaction;
 
     TransactionResult(Transaction<T> transaction) {
         this.transaction = transaction;
@@ -33,7 +33,7 @@ final class TransactionResult<T> implements DataTransactionResult<T> {
     }
 
     @Override
-    public Optional<org.panda_lang.autodata.data.transaction.DataTransactionAction> getSuccessAction() {
+    public Optional<DataTransactionAction> getSuccessAction() {
         return Optional.ofNullable(transaction.success);
     }
 

@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
 
 final class ProxyQueryParser {
 
-    private static final List<org.panda_lang.autodata.data.query.DataQueryCategoryType> CATEGORIES = Arrays.asList(org.panda_lang.autodata.data.query.DataQueryCategoryType.values());
+    private static final List<DataQueryCategoryType> CATEGORIES = Arrays.asList(DataQueryCategoryType.values());
 
     private static final String AND = "and";
     private static final String OR = "or";
@@ -47,13 +47,13 @@ final class ProxyQueryParser {
         List<String> query = Lists.subList(CamelCaseUtils.split(method.getName(), String::toLowerCase), 1);
         Parameter[] parameters = method.getParameters();
 
-        Map<org.panda_lang.autodata.data.query.DataQueryCategoryType, List<String>> data = toCategories(query);
-        Map<String, org.panda_lang.autodata.data.query.DataQueryCategory> queryData = toQueryData(scheme, data);
+        Map<DataQueryCategoryType, List<String>> data = toCategories(query);
+        Map<String, DataQueryCategory> queryData = toQueryData(scheme, data);
 
-        return new org.panda_lang.autodata.data.query.ProxyQuery(method.getReturnType(), queryData);
+        return new ProxyQuery(method.getReturnType(), queryData);
     }
 
-    private Map<String, org.panda_lang.autodata.data.query.DataQueryCategory> toQueryData(EntityModel scheme, Map<org.panda_lang.autodata.data.query.DataQueryCategoryType, List<String>> data) {
+    private Map<String, DataQueryCategory> toQueryData(EntityModel scheme, Map<DataQueryCategoryType, List<String>> data) {
         Map<String, DataQueryCategory> queryData = new HashMap<>();
         AtomicInteger index = new AtomicInteger();
 
@@ -62,30 +62,30 @@ final class ProxyQueryParser {
                     .map(elementSource -> toRule(scheme, elementSource, index))
                     .collect(Collectors.toList());
 
-            queryData.put(key.getName(), new org.panda_lang.autodata.data.query.ProxyQueryCategory(key, rules));
+            queryData.put(key.getName(), new ProxyQueryCategory(key, rules));
         });
 
         return queryData;
     }
 
-    private org.panda_lang.autodata.data.query.ProxyQueryRuleScheme toRule(EntityModel scheme, List<String> rules, AtomicInteger index) {
-        return new org.panda_lang.autodata.data.query.ProxyQueryRuleScheme(rules.stream()
+    private ProxyQueryRuleScheme toRule(EntityModel scheme, List<String> rules, AtomicInteger index) {
+        return new ProxyQueryRuleScheme(rules.stream()
                 .filter(property -> !property.equals(AND))
                 .map(property -> {
                     Optional<Property> propertyValue = scheme.getProperty(property);
-                    return new org.panda_lang.autodata.data.query.ProxyQueryRuleProperty(propertyValue.isPresent() ? propertyValue.get() : property);
+                    return new ProxyQueryRuleProperty(propertyValue.isPresent() ? propertyValue.get() : property);
                 })
                 .map(property -> new Pair<>(property, property.isEntityProperty() ? index.getAndIncrement() : -1))
                 .collect(Collectors.toList()));
     }
 
-    private Map<org.panda_lang.autodata.data.query.DataQueryCategoryType, List<String>> toCategories(List<String> query) {
-        Map<org.panda_lang.autodata.data.query.DataQueryCategoryType, List<String>> data = new TreeMap<>(Comparator.comparingInt(Enum::ordinal));
-        org.panda_lang.autodata.data.query.DataQueryCategoryType currentCategory = CATEGORIES.get(0);
+    private Map<DataQueryCategoryType, List<String>> toCategories(List<String> query) {
+        Map<DataQueryCategoryType, List<String>> data = new TreeMap<>(Comparator.comparingInt(Enum::ordinal));
+        DataQueryCategoryType currentCategory = CATEGORIES.get(0);
         int amount = 1;
 
         for (String element : query) {
-            org.panda_lang.autodata.data.query.DataQueryCategoryType category = org.panda_lang.autodata.data.query.DataQueryCategoryType.of(element);
+            DataQueryCategoryType category = DataQueryCategoryType.of(element);
             int index = CATEGORIES.indexOf(category);
 
             if (index > 0 && index > CATEGORIES.indexOf(currentCategory) && amount > 0) {
@@ -103,7 +103,7 @@ final class ProxyQueryParser {
         data.forEach((key, value) -> {
             List<String> convertedValues = new ArrayList<>(value.size());
 
-            List<List<String>> prepared = org.panda_lang.autodata.data.query.ProxyQueryParserUtils.split(value, element -> element.equals(AND) || element.equals(OR));
+            List<List<String>> prepared = ProxyQueryParserUtils.split(value, element -> element.equals(AND) || element.equals(OR));
             prepared.forEach(list -> convertedValues.add(ContentJoiner.on("_").join(list).toString()));
 
             convertedData.put(key, convertedValues);

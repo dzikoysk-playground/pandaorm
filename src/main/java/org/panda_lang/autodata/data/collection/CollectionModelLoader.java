@@ -20,7 +20,7 @@ import org.panda_lang.autodata.data.entity.EntityFactory;
 
 final class CollectionModelLoader {
 
-    private static final org.panda_lang.autodata.data.entity.EntityFactory ENTITY_FACTORY = new EntityFactory();
+    private static final EntityFactory ENTITY_FACTORY = new EntityFactory();
 
     public CollectionModel load(DataCollectionStereotype stereotype) {
         return new CollectionModel(stereotype, ENTITY_FACTORY.createEntityScheme(stereotype.getEntityClass()));

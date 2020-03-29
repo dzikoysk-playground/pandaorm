@@ -22,9 +22,9 @@ import org.panda_lang.utilities.inject.Injector;
 
 public final class RepositoryFactory {
 
-    private static final org.panda_lang.autodata.data.repository.RepositoryModelLoader REPOSITORY_SCHEME_LOADER = new org.panda_lang.autodata.data.repository.RepositoryModelLoader();
+    private static final RepositoryModelLoader REPOSITORY_SCHEME_LOADER = new RepositoryModelLoader();
 
-    public org.panda_lang.autodata.data.repository.RepositoryModel createRepositoryScheme(Injector injector, CollectionModel collectionModel) {
+    public RepositoryModel createRepositoryScheme(Injector injector, CollectionModel collectionModel) {
         return REPOSITORY_SCHEME_LOADER.load(injector, collectionModel);
     }
 

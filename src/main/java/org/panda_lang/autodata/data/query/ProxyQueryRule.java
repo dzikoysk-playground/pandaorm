@@ -22,9 +22,9 @@ import java.util.List;
 
 final class ProxyQueryRule implements DataQueryRule {
 
-    private final List<Pair<org.panda_lang.autodata.data.query.DataRuleProperty, Object>> properties;
+    private final List<Pair<DataRuleProperty, Object>> properties;
 
-    public ProxyQueryRule(List<Pair<org.panda_lang.autodata.data.query.DataRuleProperty, Object>> properties) {
+    public ProxyQueryRule(List<Pair<DataRuleProperty, Object>> properties) {
         this.properties = properties;
     }
 

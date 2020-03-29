@@ -33,20 +33,20 @@ final class ProxyGenerator {
     private static final ProxyMethodGenerator REPOSITORY_METHOD_GENERATOR =  new ProxyMethodGenerator();
     private static final EntityFactory ENTITY_FACTORY = new EntityFactory();
 
-    protected org.panda_lang.autodata.data.repository.RepositoryModel generate(CollectionModel collectionModel) {
+    protected RepositoryModel generate(CollectionModel collectionModel) {
         Class<? extends DataRepository> repositoryClass = collectionModel.getRepositoryClass();
 
-        Map<org.panda_lang.autodata.data.repository.RepositoryOperation, Collection<org.panda_lang.autodata.data.repository.RepositoryMethod>> methods = new HashMap<>();
+        Map<RepositoryOperation, Collection<RepositoryMethod>> methods = new HashMap<>();
 
         for (Method method : repositoryClass.getDeclaredMethods()) {
-            org.panda_lang.autodata.data.repository.RepositoryOperation operation = RepositoryOperation.of(CamelCaseUtils.split(method.getName()).get(0));
+            RepositoryOperation operation = RepositoryOperation.of(CamelCaseUtils.split(method.getName()).get(0));
             methods.computeIfAbsent(operation, (key) -> new ArrayList<>()).add(new RepositoryMethod(method, operation));
         }
 
-        org.panda_lang.autodata.data.repository.ProxyInvocationHandler handler = new org.panda_lang.autodata.data.repository.ProxyInvocationHandler(collectionModel);
+        ProxyInvocationHandler handler = new ProxyInvocationHandler(collectionModel);
         DataRepository<?> repository = (DataRepository<?>) Proxy.newProxyInstance(getClass().getClassLoader(), new Class[] { repositoryClass }, handler);
 
-        return new org.panda_lang.autodata.data.repository.RepositoryModel(collectionModel, repository, methods, handler);
+        return new RepositoryModel(collectionModel, repository, methods, handler);
     }
 
     protected void generateMethods(DataController controller, DataCollection collection, RepositoryModel repositoryModel) {

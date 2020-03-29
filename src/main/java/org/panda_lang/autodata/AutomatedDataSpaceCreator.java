@@ -27,7 +27,7 @@ import java.util.List;
 public final class AutomatedDataSpaceCreator {
 
     protected final Injector injector;
-    protected final org.panda_lang.autodata.data.repository.DataController controller;
+    protected final DataController controller;
     protected final List<DataCollectionStereotype> stereotypes = new ArrayList<>();
 
     AutomatedDataSpaceCreator(DataController controller) {
@@ -44,12 +44,12 @@ public final class AutomatedDataSpaceCreator {
         return DataCollectionStereotype.builder(this);
     }
 
-    public org.panda_lang.autodata.AutomatedDataSpace collect() {
+    public AutomatedDataSpace collect() {
         if (controller == null) {
             throw new AutomatedDataException("Missing data controller");
         }
 
-        org.panda_lang.autodata.AutomatedDataSpace automatedDataSpace = new AutomatedDataSpace(controller);
+        AutomatedDataSpace automatedDataSpace = new AutomatedDataSpace(controller);
 
         AutomatedDataSpaceInitializer dataSpaceInitializer = new AutomatedDataSpaceInitializer(automatedDataSpace, injector);
         dataSpaceInitializer.initialize(stereotypes).forEach(automatedDataSpace::addCollection);

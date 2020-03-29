@@ -24,8 +24,8 @@ final class RepositoryModelLoader {
 
     private static final ProxyGenerator REPOSITORY_GENERATOR = new ProxyGenerator();
 
-    protected org.panda_lang.autodata.data.repository.RepositoryModel load(Injector injector, CollectionModel collectionModel) {
-        org.panda_lang.autodata.data.repository.RepositoryModel repositoryModel = REPOSITORY_GENERATOR.generate(collectionModel);
+    protected RepositoryModel load(Injector injector, CollectionModel collectionModel) {
+        RepositoryModel repositoryModel = REPOSITORY_GENERATOR.generate(collectionModel);
 
         injector.getResources()
                 .on(repositoryModel.getRepository().getClass())

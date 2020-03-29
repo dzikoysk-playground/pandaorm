@@ -25,17 +25,17 @@ public final class RepositoryModel {
 
     private final CollectionModel scheme;
     private final DataRepository<?> repository;
-    private final Map<org.panda_lang.autodata.data.repository.RepositoryOperation, Collection<org.panda_lang.autodata.data.repository.RepositoryMethod>> methods;
-    private final org.panda_lang.autodata.data.repository.ProxyInvocationHandler handler;
+    private final Map<RepositoryOperation, Collection<RepositoryMethod>> methods;
+    private final ProxyInvocationHandler handler;
 
-    RepositoryModel(CollectionModel scheme, DataRepository<?> repository, Map<org.panda_lang.autodata.data.repository.RepositoryOperation, Collection<org.panda_lang.autodata.data.repository.RepositoryMethod>> methods, org.panda_lang.autodata.data.repository.ProxyInvocationHandler handler) {
+    RepositoryModel(CollectionModel scheme, DataRepository<?> repository, Map<RepositoryOperation, Collection<RepositoryMethod>> methods, ProxyInvocationHandler handler) {
         this.repository = repository;
         this.methods = methods;
         this.scheme = scheme;
         this.handler = handler;
     }
 
-    public org.panda_lang.autodata.data.repository.ProxyInvocationHandler getHandler() {
+    public ProxyInvocationHandler getHandler() {
         return handler;
     }
 

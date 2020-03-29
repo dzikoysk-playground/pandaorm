@@ -22,9 +22,9 @@ public final class MethodModel {
 
     private final Method method;
     private final MethodType type;
-    private final org.panda_lang.autodata.data.entity.Property property;
+    private final Property property;
 
-    MethodModel(Method method, MethodType type, org.panda_lang.autodata.data.entity.Property property) {
+    MethodModel(Method method, MethodType type, Property property) {
         this.method = method;
         this.property = property;
         this.type = type;
