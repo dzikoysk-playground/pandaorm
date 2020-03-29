@@ -21,10 +21,10 @@ import org.panda_lang.autodata.data.collection.DataCollection;
 import org.panda_lang.autodata.data.entity.EntityModel;
 import org.panda_lang.autodata.data.query.DataQuery;
 import org.panda_lang.autodata.data.query.DataQueryFactory;
-import org.panda_lang.panda.utilities.commons.ArrayUtils;
-import org.panda_lang.panda.utilities.commons.CamelCaseUtils;
-import org.panda_lang.panda.utilities.commons.function.ThrowingConsumer;
-import org.panda_lang.panda.utilities.commons.function.ThrowingFunction;
+import org.panda_lang.utilities.commons.ArrayUtils;
+import org.panda_lang.utilities.commons.CamelCaseUtils;
+import org.panda_lang.utilities.commons.function.ThrowingConsumer;
+import org.panda_lang.utilities.commons.function.ThrowingFunction;
 
 import java.lang.reflect.Method;
 import java.util.List;

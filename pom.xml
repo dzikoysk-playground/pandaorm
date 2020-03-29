@@ -25,7 +25,7 @@
         <dependency>
             <groupId>org.panda-lang</groupId>
             <artifactId>panda-utilities</artifactId>
-            <version>indev-19.8.24</version>
+            <version>indev-20.3.14</version>
         </dependency>
 
         <!-- Tests -->

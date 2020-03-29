@@ -1,3 +1,5 @@
+package org.panda_lang.autodata.utils;
+
 /*
  * Copyright (c) 2015-2019 Dzikoysk
  *
@@ -14,22 +16,21 @@
  * limitations under the License.
  */
 
-package org.panda_lang.autodata.sql;
+import java.util.function.Supplier;
 
-import org.panda_lang.autodata.defaults.sql.SQLRepository;
-import org.panda_lang.autodata.orm.As;
-import org.panda_lang.autodata.stereotype.Repository;
+public final class FunctionUtils {
 
-import java.util.Optional;
-import java.util.UUID;
+    private FunctionUtils() { }
 
-@Repository
-public interface UserRepository extends SQLRepository<User> {
-
-    User createUser(@As("name") String name);
-
-    Optional<User> findUserByName(String name);
-
-    User findByNameOrId(String name, UUID id);
+    /**
+     * Convert value into supplier
+     *
+     * @param value the value to return
+     * @param <T> type of value
+     * @return supplier returning the value
+     */
+    public static <T> Supplier<T> toSupplier(T value) {
+        return () -> value;
+    }
 
 }

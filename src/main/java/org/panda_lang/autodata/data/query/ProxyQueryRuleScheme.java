@@ -16,7 +16,7 @@
 
 package org.panda_lang.autodata.data.query;
 
-import org.panda_lang.panda.utilities.commons.collection.Pair;
+import org.panda_lang.utilities.commons.collection.Pair;
 
 import java.util.ArrayList;
 import java.util.List;

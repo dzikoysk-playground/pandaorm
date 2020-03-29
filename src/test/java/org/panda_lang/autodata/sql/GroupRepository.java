@@ -16,8 +16,8 @@
 
 package org.panda_lang.autodata.sql;
 
-import org.panda_lang.panda.utilities.autodata.defaults.sql.SQLRepository;
-import org.panda_lang.panda.utilities.autodata.stereotype.Repository;
+import org.panda_lang.autodata.defaults.sql.SQLRepository;
+import org.panda_lang.autodata.stereotype.Repository;
 
 @Repository
 public interface GroupRepository extends SQLRepository<Group> {

@@ -21,7 +21,7 @@ import org.panda_lang.autodata.data.repository.DataHandler;
 import org.panda_lang.autodata.data.collection.CollectionModel;
 import org.panda_lang.autodata.data.collection.DataCollection;
 import org.panda_lang.autodata.orm.Association;
-import org.panda_lang.panda.utilities.commons.collection.Pair;
+import org.panda_lang.utilities.commons.collection.Pair;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -29,14 +29,14 @@ import java.util.Map;
 
 public final class SQLDataController implements DataController {
 
-    private final Map<String, org.panda_lang.autodata.defaults.sql.SQLDataHandler> tablesHandlers = new HashMap<>();
+    private final Map<String, SQLDataHandler> tablesHandlers = new HashMap<>();
 
     @Override
     public void initializeSchemes(Collection<? extends CollectionModel> schemes) {
         Map<String, Pair<String, String>> junctions = new HashMap<>();
 
         for (CollectionModel scheme : schemes) {
-            tablesHandlers.put(scheme.getName(), new org.panda_lang.autodata.defaults.sql.SQLDataHandler());
+            tablesHandlers.put(scheme.getName(), new SQLDataHandler());
 
             scheme.getEntityModel().getProperties().forEach((name, property) -> {
                 property.getAnnotations().getAnnotation(Association.class).ifPresent(association -> {
@@ -47,7 +47,7 @@ public final class SQLDataController implements DataController {
         }
 
         junctions.forEach((name, scheme) -> {
-            tablesHandlers.put(name, new org.panda_lang.autodata.defaults.sql.SQLDataHandler());
+            tablesHandlers.put(name, new SQLDataHandler());
         });
 
         System.out.println("Generated handlers for tables: ");
@@ -61,7 +61,7 @@ public final class SQLDataController implements DataController {
 
     @Override
     public <ENTITY> DataHandler<ENTITY> getHandler(String collection) {
-        return new org.panda_lang.autodata.defaults.sql.SQLDataHandler<>();
+        return new SQLDataHandler<>();
     }
 
     @Override

@@ -19,7 +19,7 @@ package org.panda_lang.autodata.data.repository;
 import org.panda_lang.autodata.data.collection.CollectionModel;
 import org.panda_lang.autodata.data.collection.DataCollection;
 import org.panda_lang.autodata.data.entity.EntityFactory;
-import org.panda_lang.panda.utilities.commons.CamelCaseUtils;
+import org.panda_lang.utilities.commons.CamelCaseUtils;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;

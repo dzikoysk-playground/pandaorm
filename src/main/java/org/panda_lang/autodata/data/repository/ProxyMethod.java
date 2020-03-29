@@ -16,7 +16,7 @@
 
 package org.panda_lang.autodata.data.repository;
 
-import org.panda_lang.panda.utilities.commons.function.ThrowingFunction;
+import org.panda_lang.utilities.commons.function.ThrowingFunction;
 
 final class ProxyMethod {
 

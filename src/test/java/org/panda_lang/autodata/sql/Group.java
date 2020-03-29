@@ -16,11 +16,11 @@
 
 package org.panda_lang.autodata.sql;
 
-import org.panda_lang.panda.utilities.autodata.data.entity.DataEntity;
-import org.panda_lang.panda.utilities.autodata.orm.Association;
-import org.panda_lang.panda.utilities.autodata.orm.Generated;
-import org.panda_lang.panda.utilities.autodata.orm.Id;
-import org.panda_lang.panda.utilities.autodata.stereotype.Entity;
+import org.panda_lang.autodata.data.entity.DataEntity;
+import org.panda_lang.autodata.orm.Association;
+import org.panda_lang.autodata.orm.Generated;
+import org.panda_lang.autodata.orm.Id;
+import org.panda_lang.autodata.stereotype.Entity;
 
 import java.util.Collection;
 import java.util.UUID;

@@ -34,15 +34,17 @@ import org.panda_lang.autodata.data.transaction.TransactionModification;
 import org.panda_lang.autodata.orm.As;
 import org.panda_lang.autodata.orm.Generated;
 import org.panda_lang.autodata.orm.GenerationStrategy;
-import org.panda_lang.panda.utilities.commons.ArrayUtils;
-import org.panda_lang.panda.utilities.commons.ClassPoolUtils;
-import org.panda_lang.panda.utilities.commons.ClassUtils;
-import org.panda_lang.panda.utilities.commons.FunctionUtils;
-import org.panda_lang.panda.utilities.commons.collection.Maps;
-import org.panda_lang.panda.utilities.commons.javassist.implementer.FunctionalInterfaceImplementer;
+import org.panda_lang.autodata.utils.FunctionUtils;
+import org.panda_lang.utilities.commons.ArrayUtils;
+import org.panda_lang.utilities.commons.ClassPoolUtils;
+import org.panda_lang.utilities.commons.ClassUtils;
+import org.panda_lang.utilities.commons.collection.Maps;
+import org.panda_lang.utilities.commons.javassist.CtCode;
+import org.panda_lang.utilities.commons.javassist.implementer.FunctionalInterfaceImplementer;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Optional;
@@ -52,7 +54,7 @@ final class EntityGenerator {
 
     private static final FunctionalInterfaceImplementer IMPLEMENTER = new FunctionalInterfaceImplementer();
 
-    private static final CtClass[] TRANSACTION_RUN_TYPES = new CtClass[] { org.panda_lang.autodata.data.entity.EntityGeneratorConstants.CT_RUNNABLE, org.panda_lang.autodata.data.entity.EntityGeneratorConstants.CT_ARRAY_LIST };
+    private static final CtClass[] TRANSACTION_RUN_TYPES = new CtClass[] { EntityGeneratorConstants.CT_RUNNABLE, EntityGeneratorConstants.CT_ARRAY_LIST };
 
     @SuppressWarnings("unchecked")
     protected Class<? extends DataEntity> generate(org.panda_lang.autodata.data.repository.RepositoryModel repositoryModel) throws NotFoundException, CannotCompileException {
@@ -85,18 +87,18 @@ final class EntityGenerator {
     }
 
     private void generateDefaultFields(CtClass entityClass) throws CannotCompileException {
-        CtField dataHandler = new CtField(org.panda_lang.autodata.data.entity.EntityGeneratorConstants.CT_DATA_HANDLER, "_dataHandler", entityClass);
+        CtField dataHandler = new CtField(EntityGeneratorConstants.CT_DATA_HANDLER, "_dataHandler", entityClass);
         entityClass.addField(dataHandler);
 
-        CtField lock = new CtField(org.panda_lang.autodata.data.entity.EntityGeneratorConstants.CT_ATOMIC_BOOLEAN, "_lock", entityClass);
+        CtField lock = new CtField(EntityGeneratorConstants.CT_ATOMIC_BOOLEAN, "_lock", entityClass);
         entityClass.addField(lock);
 
-        CtField modifications = new CtField(org.panda_lang.autodata.data.entity.EntityGeneratorConstants.CT_ARRAY_LIST, "_modifications", entityClass);
+        CtField modifications = new CtField(EntityGeneratorConstants.CT_ARRAY_LIST, "_modifications", entityClass);
         entityClass.addField(modifications);
     }
 
     private void generateDefaultConstructor(EntityModel scheme, CtClass entityClass) throws CannotCompileException {
-        CtConstructor constructor = new CtConstructor(new CtClass[]{ org.panda_lang.autodata.data.entity.EntityGeneratorConstants.CT_DATA_HANDLER }, entityClass);
+        CtConstructor constructor = new CtConstructor(new CtClass[]{ EntityGeneratorConstants.CT_DATA_HANDLER }, entityClass);
 
         StringBuilder bodyBuilder = new StringBuilder("{");
         bodyBuilder.append("this._lock = new ").append(AtomicBoolean.class.getName()).append("(false);");
@@ -143,17 +145,18 @@ final class EntityGenerator {
             ctTypes[index] = ClassPoolUtils.get(types[index]);
         }
 
-        CtConstructor constructor = new CtConstructor(ArrayUtils.mergeArrays(new CtClass[] { org.panda_lang.autodata.data.entity.EntityGeneratorConstants.CT_DATA_HANDLER }, ctTypes), entityClass);
-        StringBuilder bodyBuilder = new StringBuilder("{ this($1);");
+        CtConstructor constructor = new CtConstructor(ArrayUtils.mergeArrays(new CtClass[] { EntityGeneratorConstants.CT_DATA_HANDLER }, ctTypes), entityClass);
+        String body = "this($1);";
 
         for (int index = 0; index < parameters.length; index++) {
             Parameter parameter = parameters[index];
             As as = parameter.getAnnotation(As.class);
 
-            bodyBuilder.append("this.").append(as.value()).append(" = $").append(index + 2).append(";");
+            //noinspection StringConcatenationInLoop
+            body += "this." + as.value() + " = $" + (index + 2) + ";";
         }
 
-        constructor.setBody(bodyBuilder.append("}").toString());
+        constructor.setBody("{ " + body + " }");
         return constructor;
     }
 
@@ -174,61 +177,56 @@ final class EntityGenerator {
                 getMethod.setBody("return ($r) this." + method.getProperty().getName() + ";");
                 return getMethod;
             case SET:
-                CtMethod setMethod = new CtMethod(org.panda_lang.autodata.data.entity.EntityGeneratorConstants.CT_VOID, name, new CtClass[]{ type }, entityClass);
-
-                String propertyType = method.getProperty().getName();
-                String modType = TransactionModification.class.getName();
-                String defTransType = DefaultTransaction.class.getName();
-
-                //noinspection Duplicates
-                setMethod.setBody(new StringBuilder()
-                        .append("{")
-                        .append("  this.").append(propertyType).append(" = $1;")
-                        .append("  ").append(modType).append(" modification = new ").append(modType).append("(\"").append(propertyType).append("\", $1);")
-                        .append("  if (this._lock.get() == true) { ")
-                        .append("    this._modifications.add(modification);")
-                        .append("    return;")
-                        .append("  }")
-                        .append("  ").append(defTransType).append(".of(this._dataHandler, this, modification).commit();")
-                        .append("}")
-                        .toString());
-
-                return setMethod;
+                return CtCode.of(new CtMethod(EntityGeneratorConstants.CT_VOID, name, new CtClass[]{ type }, entityClass))
+                        .alias("{'}", "\"")
+                        .alias("{propertyType}", method.getProperty().getName())
+                        .alias("{TransactionModification}", TransactionModification.class.getName())
+                        .alias("{DefaultTransaction}", DefaultTransaction.class.getName())
+                        .compile(
+                                "this.{propertyType} = $1;",
+                                "{TransactionModification} modification = new {TransactionModification}({'}{propertyType}{'} ,$1);",
+                                "if (this._lock.get() == true) {",
+                                "  this._modifications.add(modification);",
+                                "  return;",
+                                "}",
+                                "{DefaultTransaction}.of(this._dataHandler, this, modification).commit();"
+                        );
         }
 
         return null;
     }
 
     private void generateTransactions(CtClass entityClass) throws CannotCompileException, NotFoundException {
-        CtMethod runnableMethod = new CtMethod(org.panda_lang.autodata.data.entity.EntityGeneratorConstants.CT_VOID, "transactionRun", TRANSACTION_RUN_TYPES, entityClass);
+        CtMethod runnableMethod = CtCode.of(new CtMethod(EntityGeneratorConstants.CT_VOID, "transactionRun", TRANSACTION_RUN_TYPES, entityClass))
+                .compile(
+                        "synchronized (this._lock) { ",
+                        "    this._modifications = $2;",
+                        "    this._lock.set(true);",
+                        "    $1.run();",
+                        "    this._lock.set(false);",
+                        "    this._modifications = null;",
+                        "}"
+                );
+
         runnableMethod.setModifiers(Modifier.PUBLIC);
-        runnableMethod.setBody(new StringBuilder()
-                .append("{")
-                .append("  synchronized (this._lock) { ")
-                .append("    this._modifications = $2;")
-                .append("    this._lock.set(true);")
-                .append("    $1.run();")
-                .append("    this._lock.set(false);")
-                .append("    this._modifications = null;")
-                .append("  }")
-                .append("}")
-                .toString());
         entityClass.addMethod(runnableMethod);
 
         LinkedHashMap<String, CtClass> parameters = new LinkedHashMap<>();
         parameters.put("entity", entityClass);
-        parameters.put("runnable", org.panda_lang.autodata.data.entity.EntityGeneratorConstants.CT_RUNNABLE);
-        parameters.put("list", org.panda_lang.autodata.data.entity.EntityGeneratorConstants.CT_ARRAY_LIST);
+        parameters.put("runnable", EntityGeneratorConstants.CT_RUNNABLE);
+        parameters.put("list", EntityGeneratorConstants.CT_ARRAY_LIST);
 
         Class<?> runnableClass = IMPLEMENTER.generate(entityClass.getName() + "TransactionRunnable", Runnable.class, parameters, "entity.transactionRun(this.runnable, this.list);");
 
-        CtMethod transactionMethod = new CtMethod(org.panda_lang.autodata.data.entity.EntityGeneratorConstants.CT_DATA_TRANSACTION, "transaction", new CtClass[]{ org.panda_lang.autodata.data.entity.EntityGeneratorConstants.CT_RUNNABLE }, entityClass);
-        transactionMethod.setBody(new StringBuilder("{")
-                .append("  java.util.ArrayList list = new java.util.ArrayList();")
-                .append("  return new ").append(Transaction.class.getName()).append("(this._dataHandler, this, ")
-                .append("    new ").append(runnableClass.getName()).append("(this, $1, list), ")
-                .append("    ").append(FunctionUtils.class.getName()).append(".toSupplier(list));")
-                .append("}").toString());
+        CtMethod transactionMethod = CtCode.of(new CtMethod(EntityGeneratorConstants.CT_DATA_TRANSACTION, "transaction", new CtClass[]{ EntityGeneratorConstants.CT_RUNNABLE }, entityClass))
+                .alias("{FunctionUtils}", FunctionUtils.class.getName())
+                .alias("{Transaction}", Transaction.class.getName())
+                .alias("{Runnable}", runnableClass.getName())
+                .alias("{ArrayList}", ArrayList.class.getName())
+                .compile(
+                        "{ArrayList} list = new {ArrayList}();",
+                        "return new {Transaction}(this._dataHandler, this, new {Runnable}(this, $1, list), {FunctionUtils}.toSupplier(list));"
+                );
         entityClass.addMethod(transactionMethod);
     }
 

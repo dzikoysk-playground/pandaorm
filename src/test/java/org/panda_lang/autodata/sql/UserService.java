@@ -16,9 +16,9 @@
 
 package org.panda_lang.autodata.sql;
 
-import org.panda_lang.panda.utilities.autodata.orm.Berry;
-import org.panda_lang.panda.utilities.autodata.stereotype.Service;
-import org.panda_lang.panda.utilities.inject.annotations.Autowired;
+import org.panda_lang.autodata.orm.Berry;
+import org.panda_lang.autodata.stereotype.Service;
+import org.panda_lang.utilities.inject.annotations.Inject;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -28,7 +28,7 @@ class UserService {
 
     private final UserRepository repository;
 
-    @Autowired
+    @Inject
     public UserService(@Berry("users") UserRepository repository) {
         this.repository = repository;
     }

@@ -18,9 +18,9 @@ package org.panda_lang.autodata.data.entity;
 
 import org.panda_lang.autodata.AutomatedDataException;
 import org.panda_lang.autodata.orm.Association;
-import org.panda_lang.panda.utilities.commons.CamelCaseUtils;
-import org.panda_lang.panda.utilities.commons.annotations.Annotations;
-import org.panda_lang.panda.utilities.commons.text.ContentJoiner;
+import org.panda_lang.autodata.utils.Annotations;
+import org.panda_lang.utilities.commons.CamelCaseUtils;
+import org.panda_lang.utilities.commons.text.ContentJoiner;
 
 import java.lang.reflect.Method;
 import java.util.Collection;

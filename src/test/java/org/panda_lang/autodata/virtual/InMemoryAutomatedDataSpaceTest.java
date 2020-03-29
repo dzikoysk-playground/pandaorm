@@ -14,24 +14,24 @@
  * limitations under the License.
  */
 
-package org.panda_lang.panda.utilities.autodata.virtual;
+package org.panda_lang.autodata.virtual;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.panda_lang.panda.utilities.autodata.AutomatedDataSpace;
-import org.panda_lang.panda.utilities.autodata.data.collection.DataCollection;
-import org.panda_lang.panda.utilities.autodata.data.entity.DataEntity;
-import org.panda_lang.panda.utilities.autodata.data.transaction.DataTransaction;
-import org.panda_lang.panda.utilities.autodata.defaults.virtual.InMemoryDataController;
-import org.panda_lang.panda.utilities.autodata.defaults.virtual.InMemoryDataRepository;
-import org.panda_lang.panda.utilities.autodata.orm.As;
-import org.panda_lang.panda.utilities.autodata.orm.Berry;
-import org.panda_lang.panda.utilities.autodata.orm.Generated;
-import org.panda_lang.panda.utilities.autodata.orm.Id;
-import org.panda_lang.panda.utilities.autodata.stereotype.Entity;
-import org.panda_lang.panda.utilities.autodata.stereotype.Repository;
-import org.panda_lang.panda.utilities.autodata.stereotype.Service;
-import org.panda_lang.panda.utilities.inject.annotations.Autowired;
+import org.panda_lang.autodata.AutomatedDataSpace;
+import org.panda_lang.autodata.data.collection.DataCollection;
+import org.panda_lang.autodata.data.entity.DataEntity;
+import org.panda_lang.autodata.data.transaction.DataTransaction;
+import org.panda_lang.autodata.defaults.virtual.InMemoryDataController;
+import org.panda_lang.autodata.defaults.virtual.InMemoryDataRepository;
+import org.panda_lang.autodata.orm.As;
+import org.panda_lang.autodata.orm.Berry;
+import org.panda_lang.autodata.orm.Generated;
+import org.panda_lang.autodata.orm.Id;
+import org.panda_lang.autodata.stereotype.Entity;
+import org.panda_lang.autodata.stereotype.Repository;
+import org.panda_lang.autodata.stereotype.Service;
+import org.panda_lang.utilities.inject.annotations.Inject;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -40,7 +40,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 final class InMemoryAutomatedDataSpaceTest {
 
     @Test
-    void test() {
+    void testInMemory() {
         AutomatedDataSpace space = AutomatedDataSpace.initialize(new InMemoryDataController())
                 .createCollection()
                     .name("users")
@@ -92,7 +92,7 @@ final class InMemoryAutomatedDataSpaceTest {
     @Service
     static class SpecialUserService {
 
-        @Autowired
+        @Inject
         public SpecialUserService(UserService service, @Berry("special-users") UserRepository repository) {
             Assertions.assertNotEquals(repository, service.repository);
         }
@@ -104,7 +104,7 @@ final class InMemoryAutomatedDataSpaceTest {
 
         private final UserRepository repository;
 
-        @Autowired
+        @Inject
         public UserService(@Berry("users") UserRepository repository) {
             this.repository = repository;
         }

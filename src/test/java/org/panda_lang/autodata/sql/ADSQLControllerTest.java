@@ -17,13 +17,16 @@
 package org.panda_lang.autodata.sql;
 
 import org.junit.jupiter.api.Test;
-import org.panda_lang.panda.utilities.autodata.AutomatedDataSpace;
-import org.panda_lang.panda.utilities.autodata.defaults.sql.SQLDataController;
+import org.panda_lang.autodata.AutomatedDataSpace;
+import org.panda_lang.autodata.defaults.sql.SQLDataController;
+import org.panda_lang.utilities.commons.UnsafeUtils;
 
 final class ADSQLControllerTest {
 
     @Test
     void testSQL() {
+        UnsafeUtils.disableIllegalAccessMessage();
+
         SQLDataController sqlController = new SQLDataController();
 
         AutomatedDataSpace space = AutomatedDataSpace.initialize(sqlController)

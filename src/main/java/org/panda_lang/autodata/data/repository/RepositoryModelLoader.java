@@ -18,7 +18,7 @@ package org.panda_lang.autodata.data.repository;
 
 import org.panda_lang.autodata.data.collection.CollectionModel;
 import org.panda_lang.autodata.data.collection.DataCollection;
-import org.panda_lang.panda.utilities.inject.Injector;
+import org.panda_lang.utilities.inject.Injector;
 
 final class RepositoryModelLoader {
 

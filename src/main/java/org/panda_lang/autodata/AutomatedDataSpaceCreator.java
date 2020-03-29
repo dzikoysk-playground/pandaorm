@@ -18,8 +18,8 @@ package org.panda_lang.autodata;
 
 import org.panda_lang.autodata.data.repository.DataController;
 import org.panda_lang.autodata.data.collection.DataCollectionStereotype;
-import org.panda_lang.panda.utilities.inject.DependencyInjection;
-import org.panda_lang.panda.utilities.inject.Injector;
+import org.panda_lang.utilities.inject.DependencyInjection;
+import org.panda_lang.utilities.inject.Injector;
 
 import java.util.ArrayList;
 import java.util.List;

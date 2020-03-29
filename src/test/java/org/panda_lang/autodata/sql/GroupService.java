@@ -16,15 +16,15 @@
 
 package org.panda_lang.autodata.sql;
 
-import org.panda_lang.panda.utilities.autodata.stereotype.Service;
-import org.panda_lang.panda.utilities.inject.annotations.Autowired;
+import org.panda_lang.autodata.stereotype.Service;
+import org.panda_lang.utilities.inject.annotations.Inject;
 
 @Service
 final class GroupService {
 
     private final GroupRepository repository;
 
-    @Autowired
+    @Inject
     public GroupService(GroupRepository repository) {
         this.repository = repository;
     }

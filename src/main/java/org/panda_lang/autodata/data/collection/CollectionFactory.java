@@ -24,8 +24,8 @@ import org.panda_lang.autodata.data.entity.EntityFactory;
 import org.panda_lang.autodata.data.repository.DataController;
 import org.panda_lang.autodata.data.repository.RepositoryFactory;
 import org.panda_lang.autodata.data.repository.RepositoryModel;
-import org.panda_lang.panda.utilities.inject.Injector;
-import org.panda_lang.panda.utilities.inject.InjectorException;
+import org.panda_lang.utilities.inject.Injector;
+import org.panda_lang.utilities.inject.InjectorException;
 
 import java.lang.reflect.InvocationTargetException;
 

@@ -18,10 +18,10 @@ package org.panda_lang.autodata.data.query;
 
 import org.panda_lang.autodata.data.entity.EntityModel;
 import org.panda_lang.autodata.data.entity.Property;
-import org.panda_lang.panda.utilities.commons.CamelCaseUtils;
-import org.panda_lang.panda.utilities.commons.collection.Lists;
-import org.panda_lang.panda.utilities.commons.collection.Pair;
-import org.panda_lang.panda.utilities.commons.text.ContentJoiner;
+import org.panda_lang.utilities.commons.CamelCaseUtils;
+import org.panda_lang.utilities.commons.collection.Lists;
+import org.panda_lang.utilities.commons.collection.Pair;
+import org.panda_lang.utilities.commons.text.ContentJoiner;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;

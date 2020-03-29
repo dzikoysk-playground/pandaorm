@@ -24,7 +24,7 @@ import org.panda_lang.autodata.data.collection.CollectionModel;
 import org.panda_lang.autodata.data.collection.DataCollection;
 import org.panda_lang.autodata.data.collection.DataCollectionStereotype;
 import org.panda_lang.autodata.orm.Berry;
-import org.panda_lang.panda.utilities.inject.Injector;
+import org.panda_lang.utilities.inject.Injector;
 
 import java.util.Collection;
 import java.util.Optional;

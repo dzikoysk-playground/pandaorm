@@ -27,10 +27,10 @@ import org.panda_lang.autodata.AutomatedDataException;
 import org.panda_lang.autodata.data.collection.DataCollection;
 import org.panda_lang.autodata.data.entity.Property;
 import org.panda_lang.autodata.orm.GenerationStrategy;
-import org.panda_lang.panda.utilities.commons.ArrayUtils;
-import org.panda_lang.panda.utilities.commons.ClassUtils;
-import org.panda_lang.panda.utilities.commons.collection.Lists;
-import org.panda_lang.panda.utilities.commons.collection.Pair;
+import org.panda_lang.utilities.commons.ArrayUtils;
+import org.panda_lang.utilities.commons.ClassUtils;
+import org.panda_lang.utilities.commons.collection.Lists;
+import org.panda_lang.utilities.commons.collection.Pair;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -45,7 +45,7 @@ final class InMemoryDataHandler<T> implements org.panda_lang.autodata.data.repos
     private static final AtomicInteger ID = new AtomicInteger();
 
     private final int id;
-    private final org.panda_lang.autodata.defaults.virtual.InMemoryDataController controller;
+    private final InMemoryDataController controller;
     private DataCollection collection;
 
     InMemoryDataHandler(InMemoryDataController controller) {
@@ -66,8 +66,8 @@ final class InMemoryDataHandler<T> implements org.panda_lang.autodata.data.repos
 
     @Override
     @SuppressWarnings("unchecked")
-    public Object generate(Class requestedType, GenerationStrategy strategy) {
-        return UUID.randomUUID();
+    public <R> R generate(Class<R> requestedType, GenerationStrategy strategy) {
+        return (R) UUID.randomUUID();
     }
 
     @Override

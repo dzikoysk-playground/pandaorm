@@ -16,7 +16,7 @@
 
 package org.panda_lang.autodata.data.entity;
 
-import org.panda_lang.panda.utilities.commons.annotations.Annotations;
+import org.panda_lang.autodata.utils.Annotations;
 
 public final class Property {
 
