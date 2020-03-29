@@ -1,7 +1,5 @@
-package org.panda_lang.autodata.utils;
-
 /*
- * Copyright (c) 2015-2019 Dzikoysk
+ * Copyright (c) 2019-2020 Dzikoysk
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +13,8 @@ package org.panda_lang.autodata.utils;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+package org.panda_lang.autodata.utils;
 
 import java.lang.annotation.Annotation;
 import java.util.HashMap;
