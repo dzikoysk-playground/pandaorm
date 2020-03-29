@@ -18,6 +18,7 @@ package org.panda_lang.autodata.sql;
 
 import org.junit.jupiter.api.Test;
 import org.panda_lang.autodata.AutomatedDataSpace;
+import org.panda_lang.autodata.data.collection.DataCollection;
 import org.panda_lang.autodata.data.entity.DataEntity;
 import org.panda_lang.autodata.defaults.sql.SQLDataController;
 import org.panda_lang.autodata.defaults.sql.SQLRepository;
@@ -42,9 +43,7 @@ final class ADSQLControllerTest {
     void testSQL() {
         UnsafeUtils.disableIllegalAccessMessage();
 
-        SQLDataController sqlController = new SQLDataController();
-
-        AutomatedDataSpace space = AutomatedDataSpace.initialize(sqlController)
+        AutomatedDataSpace space = AutomatedDataSpace.initialize(new SQLDataController())
                 .createCollection()
                     .name("users")
                     .entity(User.class)
@@ -58,6 +57,12 @@ final class ADSQLControllerTest {
                     .repository(GroupRepository.class)
                     .append()
                 .collect();
+
+        DataCollection users = space.getCollection("users");
+        UserService userService = users.getService(UserService.class);
+
+        User user = userService.createUser("SQLUser");
+        System.out.println("User:" + user.getName());
     }
 
 

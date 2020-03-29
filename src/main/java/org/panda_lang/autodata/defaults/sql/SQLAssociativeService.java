@@ -14,20 +14,11 @@
  * limitations under the License.
  */
 
-package org.panda_lang.autodata.data.repository;
+package org.panda_lang.autodata.defaults.sql;
 
-import io.vavr.control.Option;
-import org.panda_lang.autodata.data.collection.CollectionModel;
-import org.panda_lang.autodata.data.collection.DataCollection;
+import org.panda_lang.autodata.stereotype.Service;
 
-import java.util.Map;
-
-public interface DataController {
-
-    Map<String, ? extends DataCollection> initialize(Map<String, ? extends CollectionModel> schemes, Map<String, ? extends DataCollection> dataCollections);
-
-    <ENTITY> Option<DataHandler<ENTITY>> getHandler(String collection);
-
-    String getIdentifier();
+@Service
+public final class SQLAssociativeService {
 
 }

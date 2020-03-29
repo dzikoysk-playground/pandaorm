@@ -69,7 +69,7 @@ final class AutomatedDataSpaceInitializer {
                 .annotatedWith(Berry.class).assignHandler(initializeBerry(repositoryModels));
 
         Map<String, ? extends DataCollection> collections = createCollections(repositoryModels);
-        automatedDataSpace.getController().initialize(collectionModels, collections);
+        collections = automatedDataSpace.getController().initialize(collectionModels, collections);
 
         return collections.values();
     }

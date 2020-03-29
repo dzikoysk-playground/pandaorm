@@ -34,6 +34,8 @@ import org.panda_lang.utilities.commons.collection.Lists;
 import org.panda_lang.utilities.commons.collection.Pair;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -48,6 +50,7 @@ final class InMemoryDataHandler<T> implements DataHandler<T> {
     private final int id;
     private final InMemoryDataController controller;
     private final DataCollection collection;
+    private final Collection<Object> memory = new ArrayList<>();
 
     InMemoryDataHandler(InMemoryDataController controller, DataCollection collection) {
         this.id = ID.incrementAndGet();
@@ -62,7 +65,7 @@ final class InMemoryDataHandler<T> implements DataHandler<T> {
                 .getConstructor(ArrayUtils.mergeArrays(ArrayUtils.of(DataHandler.class), ClassUtils.getClasses(constructorArguments)))
                 .newInstance(ArrayUtils.mergeArrays(new Object[] { this }, constructorArguments));
 
-        controller.getValues().add(value);
+        memory.add(value);
         return value;
     }
 
@@ -83,7 +86,7 @@ final class InMemoryDataHandler<T> implements DataHandler<T> {
         for (DataQueryRuleScheme scheme : query.getCategory(DataQueryCategoryType.BY).getElements()) {
             DataQueryRule rule = scheme.toRule(values);
 
-            data = controller.getValues().stream()
+            data = memory.stream()
                     .filter(value -> verifyRule(rule, value))
                     .collect(Collectors.toList());
 
@@ -131,7 +134,7 @@ final class InMemoryDataHandler<T> implements DataHandler<T> {
 
     @Override
     public void delete(T entity) {
-        controller.getValues().remove(entity);
+        memory.remove(entity);
     }
 
     @Override

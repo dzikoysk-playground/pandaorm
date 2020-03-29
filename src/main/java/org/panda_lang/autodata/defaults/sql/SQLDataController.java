@@ -17,6 +17,7 @@
 package org.panda_lang.autodata.defaults.sql;
 
 import io.vavr.control.Option;
+import org.panda_lang.autodata.data.collection.DataCollectionImpl;
 import org.panda_lang.autodata.data.repository.DataController;
 import org.panda_lang.autodata.data.repository.DataHandler;
 import org.panda_lang.autodata.data.collection.CollectionModel;
@@ -33,11 +34,11 @@ public final class SQLDataController implements DataController {
     private final Map<String, SQLTableHandler<?>> tables = new HashMap<>();
 
     @Override
-    public void initialize(Map<String, ? extends CollectionModel> schemes, Map<String, ? extends DataCollection> dataCollections) {
+    public Map<String, ? extends DataCollection> initialize(Map<String, ? extends CollectionModel> schemes, Map<String, ? extends DataCollection> dataCollections) {
         Map<String, Pair<String, String>> associative = new HashMap<>();
 
         for (CollectionModel scheme : schemes.values()) {
-            tables.put(scheme.getName(), new SQLTableHandler<>(scheme.getName(), scheme.getEntityModel().getEntityType(), false));
+            tables.put(scheme.getName(), new SQLTableHandler<>(dataCollections.get(scheme.getName()), false));
 
             scheme.getEntityModel().getProperties().forEach((name, property) -> {
                 property.getAnnotations().getAnnotation(Association.class).ifPresent(association -> {
@@ -48,11 +49,14 @@ public final class SQLDataController implements DataController {
         }
 
         associative.forEach((name, scheme) -> {
-            tables.put(name, new SQLTableHandler<>(name, Pair.class, true));
+            DataCollection associativeCollection = new DataCollectionImpl(name, Pair.class, new SQLAssociativeService());
+            tables.put(name, new SQLTableHandler<>(associativeCollection, true));
         });
 
         System.out.println("Generated handlers for tables: ");
         tables.values().forEach(System.out::println);
+
+        return dataCollections;
     }
 
     @Override

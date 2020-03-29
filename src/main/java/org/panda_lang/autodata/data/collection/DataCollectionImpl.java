@@ -16,13 +16,13 @@
 
 package org.panda_lang.autodata.data.collection;
 
-final class DataCollectionImpl implements DataCollection {
+public final class DataCollectionImpl implements DataCollection {
 
     private final String name;
     private final Class<?> entity;
     private final Object service;
 
-    protected DataCollectionImpl(String name, Class<?> entity, Object service) {
+    public DataCollectionImpl(String name, Class<?> entity, Object service) {
         this.name = name;
         this.entity = entity;
         this.service = service;
