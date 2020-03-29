@@ -18,13 +18,14 @@ package org.panda_lang.autodata.data.collection;
 
 import org.panda_lang.autodata.data.entity.EntityModel;
 import org.panda_lang.autodata.data.repository.DataRepository;
+import org.panda_lang.utilities.commons.ObjectUtils;
 
 public class CollectionModel {
 
     private final DataCollectionStereotype stereotype;
-    private final org.panda_lang.autodata.data.entity.EntityModel entityModel;
+    private final EntityModel entityModel;
 
-    CollectionModel(DataCollectionStereotype stereotype, org.panda_lang.autodata.data.entity.EntityModel entityModel) {
+    CollectionModel(DataCollectionStereotype stereotype, EntityModel entityModel) {
         this.stereotype = stereotype;
         this.entityModel = entityModel;
     }
@@ -33,8 +34,8 @@ public class CollectionModel {
         return stereotype.getServiceClass();
     }
 
-    public Class<? extends DataRepository> getRepositoryClass() {
-        return stereotype.getRepositoryClass();
+    public Class<? extends DataRepository<?>> getRepositoryClass() {
+        return ObjectUtils.cast(stereotype.getRepositoryClass());
     }
 
     public EntityModel getEntityModel() {

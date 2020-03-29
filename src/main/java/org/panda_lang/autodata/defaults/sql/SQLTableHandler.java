@@ -21,7 +21,17 @@ import org.panda_lang.autodata.data.repository.DataHandler;
 import org.panda_lang.autodata.data.transaction.DataTransactionResult;
 import org.panda_lang.autodata.orm.GenerationStrategy;
 
-final class SQLDataHandler<T> implements DataHandler<T> {
+final class SQLTableHandler<T> implements DataHandler<T> {
+
+    private final String identifier;
+    private final Class<T> type;
+    private final boolean associative;
+
+    SQLTableHandler(String identifier, Class<T> type, boolean associative) {
+        this.identifier = identifier;
+        this.type = type;
+        this.associative = associative;
+    }
 
     @Override
     public T create(Object[] constructorArguments) throws Exception {
@@ -54,8 +64,18 @@ final class SQLDataHandler<T> implements DataHandler<T> {
     }
 
     @Override
+    public Class<T> getDataType() {
+        return type;
+    }
+
+    @Override
     public String getIdentifier() {
-        return null;
+        return identifier;
+    }
+
+    @Override
+    public String toString() {
+        return (associative ? "associative " : "") + getIdentifier() + "::" + getDataType().getSimpleName();
     }
 
 }

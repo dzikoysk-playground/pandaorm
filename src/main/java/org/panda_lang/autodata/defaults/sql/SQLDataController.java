@@ -16,57 +16,53 @@
 
 package org.panda_lang.autodata.defaults.sql;
 
+import io.vavr.control.Option;
 import org.panda_lang.autodata.data.repository.DataController;
 import org.panda_lang.autodata.data.repository.DataHandler;
 import org.panda_lang.autodata.data.collection.CollectionModel;
 import org.panda_lang.autodata.data.collection.DataCollection;
 import org.panda_lang.autodata.orm.Association;
+import org.panda_lang.utilities.commons.ObjectUtils;
 import org.panda_lang.utilities.commons.collection.Pair;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 public final class SQLDataController implements DataController {
 
-    private final Map<String, SQLDataHandler> tablesHandlers = new HashMap<>();
+    private final Map<String, SQLTableHandler<?>> tables = new HashMap<>();
 
     @Override
-    public void initializeSchemes(Collection<? extends CollectionModel> schemes) {
-        Map<String, Pair<String, String>> junctions = new HashMap<>();
+    public void initialize(Map<String, ? extends CollectionModel> schemes, Map<String, ? extends DataCollection> dataCollections) {
+        Map<String, Pair<String, String>> associative = new HashMap<>();
 
-        for (CollectionModel scheme : schemes) {
-            tablesHandlers.put(scheme.getName(), new SQLDataHandler());
+        for (CollectionModel scheme : schemes.values()) {
+            tables.put(scheme.getName(), new SQLTableHandler<>(scheme.getName(), scheme.getEntityModel().getEntityType(), false));
 
             scheme.getEntityModel().getProperties().forEach((name, property) -> {
                 property.getAnnotations().getAnnotation(Association.class).ifPresent(association -> {
-                    Pair<String, String> content = new Pair<>(scheme.getEntityModel().getRootClass().getSimpleName(), association.type().getSimpleName());
-                    junctions.put(association.name(), content);
+                    Pair<String, String> content = new Pair<>(scheme.getEntityModel().getEntityType().getSimpleName(), association.type().getSimpleName());
+                    associative.put(association.name(), content);
                 });
             });
         }
 
-        junctions.forEach((name, scheme) -> {
-            tablesHandlers.put(name, new SQLDataHandler());
+        associative.forEach((name, scheme) -> {
+            tables.put(name, new SQLTableHandler<>(name, Pair.class, true));
         });
 
         System.out.println("Generated handlers for tables: ");
-        tablesHandlers.keySet().forEach(System.out::println);
+        tables.values().forEach(System.out::println);
     }
 
     @Override
-    public void initializeCollections(Collection<? extends DataCollection> dataCollections) {
-
-    }
-
-    @Override
-    public <ENTITY> DataHandler<ENTITY> getHandler(String collection) {
-        return new SQLDataHandler<>();
+    public <ENTITY> Option<DataHandler<ENTITY>> getHandler(String collection) {
+        return Option.of(ObjectUtils.cast(tables.get(collection)));
     }
 
     @Override
     public String getIdentifier() {
-        return null;
+        return "sql";
     }
 
 }

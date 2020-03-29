@@ -47,16 +47,17 @@ final class InMemoryDataHandler<T> implements DataHandler<T> {
 
     private final int id;
     private final InMemoryDataController controller;
-    private DataCollection collection;
+    private final DataCollection collection;
 
-    InMemoryDataHandler(InMemoryDataController controller) {
+    InMemoryDataHandler(InMemoryDataController controller, DataCollection collection) {
         this.id = ID.incrementAndGet();
         this.controller = controller;
+        this.collection = collection;
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public T create(Object[] constructorArguments) throws Exception {
-        @SuppressWarnings("unchecked")
         T value = (T) collection.getEntityClass()
                 .getConstructor(ArrayUtils.mergeArrays(ArrayUtils.of(DataHandler.class), ClassUtils.getClasses(constructorArguments)))
                 .newInstance(ArrayUtils.mergeArrays(new Object[] { this }, constructorArguments));
@@ -83,27 +84,7 @@ final class InMemoryDataHandler<T> implements DataHandler<T> {
             DataQueryRule rule = scheme.toRule(values);
 
             data = controller.getValues().stream()
-                    .filter(value -> {
-                        for (Pair<? extends DataRuleProperty, Object> property : rule.getProperties()) {
-                            if (!property.getKey().isEntityProperty()) {
-                                continue;
-                            }
-
-                            Property schemeProperty = property.getKey().getValue();
-
-                            try {
-                                Field field = value.getClass().getDeclaredField(schemeProperty.getName());
-
-                                if (!Objects.equals(property.getValue(), field.get(value))) {
-                                    return false;
-                                }
-                            } catch (NoSuchFieldException | IllegalAccessException e) {
-                                throw new AutomatedDataException("Cannot invoke", e);
-                            }
-                        }
-
-                        return true;
-                    })
+                    .filter(value -> verifyRule(rule, value))
                     .collect(Collectors.toList());
 
             if (!data.isEmpty()) {
@@ -126,6 +107,28 @@ final class InMemoryDataHandler<T> implements DataHandler<T> {
         return ObjectUtils.cast(data.get(0));
     }
 
+    private boolean verifyRule(DataQueryRule rule, Object value) {
+        for (Pair<? extends DataRuleProperty, Object> property : rule.getProperties()) {
+            if (!property.getKey().isEntityProperty()) {
+                continue;
+            }
+
+            Property schemeProperty = property.getKey().getValue();
+
+            try {
+                Field field = value.getClass().getDeclaredField(schemeProperty.getName());
+
+                if (!Objects.equals(property.getValue(), field.get(value))) {
+                    return false;
+                }
+            } catch (NoSuchFieldException | IllegalAccessException e) {
+                throw new AutomatedDataException("Cannot invoke", e);
+            }
+        }
+
+        return true;
+    }
+
     @Override
     public void delete(T entity) {
         controller.getValues().remove(entity);
@@ -137,8 +140,9 @@ final class InMemoryDataHandler<T> implements DataHandler<T> {
         e.printStackTrace();
     }
 
-    public void setCollection(DataCollection collection) {
-        this.collection = collection;
+    @Override
+    public Class<T> getDataType() {
+        return null;
     }
 
     @Override

@@ -31,6 +31,7 @@ import org.panda_lang.autodata.orm.Id;
 import org.panda_lang.autodata.stereotype.Entity;
 import org.panda_lang.autodata.stereotype.Repository;
 import org.panda_lang.autodata.stereotype.Service;
+import org.panda_lang.utilities.commons.UnsafeUtils;
 import org.panda_lang.utilities.inject.annotations.Inject;
 
 import java.util.Optional;
@@ -41,6 +42,8 @@ final class InMemoryAutomatedDataSpaceTest {
 
     @Test
     void testInMemory() {
+        UnsafeUtils.disableIllegalAccessMessage();
+
         AutomatedDataSpace space = AutomatedDataSpace.initialize(new InMemoryDataController())
                 .createCollection()
                     .name("users")

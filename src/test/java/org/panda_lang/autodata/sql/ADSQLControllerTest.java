@@ -18,8 +18,23 @@ package org.panda_lang.autodata.sql;
 
 import org.junit.jupiter.api.Test;
 import org.panda_lang.autodata.AutomatedDataSpace;
+import org.panda_lang.autodata.data.entity.DataEntity;
 import org.panda_lang.autodata.defaults.sql.SQLDataController;
+import org.panda_lang.autodata.defaults.sql.SQLRepository;
+import org.panda_lang.autodata.orm.As;
+import org.panda_lang.autodata.orm.Association;
+import org.panda_lang.autodata.orm.Berry;
+import org.panda_lang.autodata.orm.Generated;
+import org.panda_lang.autodata.orm.Id;
+import org.panda_lang.autodata.stereotype.Entity;
+import org.panda_lang.autodata.stereotype.Repository;
+import org.panda_lang.autodata.stereotype.Service;
 import org.panda_lang.utilities.commons.UnsafeUtils;
+import org.panda_lang.utilities.inject.annotations.Inject;
+
+import java.util.Collection;
+import java.util.Optional;
+import java.util.UUID;
 
 final class ADSQLControllerTest {
 
@@ -45,5 +60,87 @@ final class ADSQLControllerTest {
                 .collect();
     }
 
+
+    @Entity
+    public interface Group extends DataEntity {
+
+        @Association(name = "members", type = User.class, relation = Association.Type.MANY)
+        Collection<User> getMembers();
+        //void addMember(User member);
+
+        void setName(String name);
+        String getName();
+
+        @Id
+        @Generated
+        UUID getId();
+
+    }
+
+    @Repository
+    public interface GroupRepository extends SQLRepository<Group> {
+
+    }
+
+    @Service
+    static final class GroupService {
+
+        private final GroupRepository repository;
+
+        @Inject
+        public GroupService(GroupRepository repository) {
+            this.repository = repository;
+        }
+
+    }
+
+    @Entity
+    public interface User extends DataEntity {
+
+        void setName(String name);
+
+        String getName();
+
+        @Id
+        @Generated
+        UUID getId();
+
+    }
+
+    @Repository
+    public interface UserRepository extends SQLRepository<User> {
+
+        User createUser(@As("name") String name);
+
+        Optional<User> findUserByName(String name);
+
+        User findByNameOrId(String name, UUID id);
+
+    }
+
+    @Service
+    static
+    class UserService {
+
+        private final UserRepository repository;
+
+        @Inject
+        public UserService(@Berry("users") UserRepository repository) {
+            this.repository = repository;
+        }
+
+        public User createUser(String name) {
+            return repository.createUser(name);
+        }
+
+        public Optional<User> findUserByName(String name) {
+            return repository.findUserByName(name);
+        }
+
+        public User findUserByNameOrId(String name, UUID id) {
+            return repository.findByNameOrId(name, id);
+        }
+
+    }
 
 }

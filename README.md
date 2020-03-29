@@ -1,6 +1,16 @@
 # Panda ORM
 Object-Relational Mapping extracted from [Panda](https://github.com/panda-lang/panda) project 
 
+#### Supported databases
+- [x] InMemory database
+- [ ] SQL databases
+- [ ] NoSQL databases
+
+#### Supported layers
+- [x] Services
+- [x] Repositories
+- [x] Entities
+
 #### Example
 ```java
 public static void main(String... args) {

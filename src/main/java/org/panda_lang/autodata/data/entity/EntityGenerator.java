@@ -59,7 +59,7 @@ final class EntityGenerator {
     @SuppressWarnings("unchecked")
     protected Class<? extends DataEntity> generate(org.panda_lang.autodata.data.repository.RepositoryModel repositoryModel) throws NotFoundException, CannotCompileException {
         EntityModel entityModel = repositoryModel.getCollectionScheme().getEntityModel();
-        Class<?> entityInterface = entityModel.getRootClass();
+        Class<?> entityInterface = entityModel.getEntityType();
 
         if (!entityInterface.isInterface()) {
             throw new AutomatedDataException("Entity class is not an interface (source: " + entityInterface.toGenericString() + ")");

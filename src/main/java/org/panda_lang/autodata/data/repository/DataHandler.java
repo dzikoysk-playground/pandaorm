@@ -34,6 +34,8 @@ public interface DataHandler<ENTITY> {
 
     void handleException(Exception e);
 
+    Class<ENTITY> getDataType();
+
     String getIdentifier();
 
 }

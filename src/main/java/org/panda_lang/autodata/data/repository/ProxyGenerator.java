@@ -34,7 +34,7 @@ final class ProxyGenerator {
     private static final EntityFactory ENTITY_FACTORY = new EntityFactory();
 
     protected RepositoryModel generate(CollectionModel collectionModel) {
-        Class<? extends DataRepository> repositoryClass = collectionModel.getRepositoryClass();
+        Class<? extends DataRepository<?>> repositoryClass = collectionModel.getRepositoryClass();
 
         Map<RepositoryOperation, Collection<RepositoryMethod>> methods = new HashMap<>();
 
@@ -50,7 +50,7 @@ final class ProxyGenerator {
     }
 
     protected void generateMethods(DataController controller, DataCollection collection, RepositoryModel repositoryModel) {
-        Class<? extends DataRepository> repositoryClass = repositoryModel.getCollectionScheme().getRepositoryClass();
+        Class<? extends DataRepository<?>> repositoryClass = repositoryModel.getCollectionScheme().getRepositoryClass();
         Map<String, ProxyMethod> generatedFunctions = new HashMap<>();
 
         for (Method method : repositoryClass.getDeclaredMethods()) {

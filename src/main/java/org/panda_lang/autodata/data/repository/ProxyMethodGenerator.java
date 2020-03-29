@@ -23,11 +23,12 @@ import org.panda_lang.autodata.data.query.DataQuery;
 import org.panda_lang.autodata.data.query.DataQueryFactory;
 import org.panda_lang.utilities.commons.ArrayUtils;
 import org.panda_lang.utilities.commons.CamelCaseUtils;
-import org.panda_lang.utilities.commons.function.ThrowingConsumer;
-import org.panda_lang.utilities.commons.function.ThrowingFunction;
+import org.panda_lang.utilities.commons.ObjectUtils;
+import org.panda_lang.utilities.commons.function.CachedSupplier;
 
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.function.Supplier;
 
 final class ProxyMethodGenerator {
 
@@ -41,18 +42,25 @@ final class ProxyMethodGenerator {
             throw new AutomatedDataException("Unknown operation: '" + elements.get(0) + "' (source: " + method.toGenericString() + ")");
         }
 
-        return new ProxyMethod(operation, generate(controller, collection, repositoryModel, method, operation));
+        return new ProxyMethod(operation, generateSupplier(controller, collection, repositoryModel, method, operation));
     }
 
-    private MethodFunction generate(DataController controller, DataCollection collection, RepositoryModel repositoryModel, Method method, RepositoryOperation operation) {
-        DataHandler handler = controller.getHandler(collection.getName());
+    private Supplier<ProxyFunction> generateSupplier(DataController controller, DataCollection collection, RepositoryModel repositoryModel, Method method, RepositoryOperation operation) {
+        return new CachedSupplier<>(() -> generate(controller, collection, repositoryModel, method, operation));
+    }
+
+    private ProxyFunction generate(DataController controller, DataCollection collection, RepositoryModel repositoryModel, Method method, RepositoryOperation operation) {
+        DataHandler<?> handler = controller.getHandler(collection.getName()).getOrElseThrow(() -> {
+            throw new AutomatedDataException("Unknown collection: " + collection.getName());
+        });
+
         EntityModel entityModel = repositoryModel.getCollectionScheme().getEntityModel();
 
         switch (operation) {
             case CREATE:
                 return createFunction(handler);
             case DELETE:
-                return deleteFunction(handler);
+                return deleteFunction(ObjectUtils.cast(handler));
             case FIND:
                 return findFunction(handler, entityModel, method);
             default:
@@ -60,23 +68,20 @@ final class ProxyMethodGenerator {
         }
     }
 
-    private MethodFunction createFunction(DataHandler handler) {
+    private ProxyFunction createFunction(DataHandler<?> handler) {
         return handler::create;
     }
 
-    @SuppressWarnings("unchecked")
-    private MethodFunction deleteFunction(DataHandler handler) {
+    private ProxyFunction deleteFunction(DataHandler<Object> handler) {
         return parameters -> {
-            ArrayUtils.forEachThrowing(parameters, (ThrowingConsumer<Object, Exception>) handler::delete);
+            ArrayUtils.forEachThrowing(parameters, handler::delete);
             return null;
         };
     }
 
-    private MethodFunction findFunction(DataHandler handler, EntityModel scheme, Method method) {
-        DataQuery query = QUERY_FACTORY.create(scheme, method);
+    private ProxyFunction findFunction(DataHandler<?> handler, EntityModel scheme, Method method) {
+        DataQuery<?> query = QUERY_FACTORY.create(scheme, method);
         return parameters -> handler.find(query, parameters);
     }
-
-    private interface MethodFunction extends ThrowingFunction<Object[], Object, Exception> { }
 
 }

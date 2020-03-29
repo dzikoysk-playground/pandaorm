@@ -27,6 +27,7 @@ import org.panda_lang.autodata.orm.Berry;
 import org.panda_lang.utilities.inject.Injector;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
@@ -61,26 +62,26 @@ final class AutomatedDataSpaceInitializer {
 
      */
     protected Collection<? extends DataCollection> initialize(Collection<? extends DataCollectionStereotype> stereotypes) {
-        Collection<CollectionModel> collectionModels = initializeSchemes(stereotypes);
-        automatedDataSpace.getController().initializeSchemes(collectionModels);
-
+        Map<String, CollectionModel> collectionModels = initializeSchemes(stereotypes);
         Collection<RepositoryModel> repositoryModels = initializeRepositories(collectionModels);
-        injector.getResources().annotatedWith(Berry.class).assignHandler(initializeBerry(repositoryModels));
 
-        Collection<? extends DataCollection> collections = createCollections(repositoryModels);
-        automatedDataSpace.getController().initializeCollections(collections);
+        injector.getResources()
+                .annotatedWith(Berry.class).assignHandler(initializeBerry(repositoryModels));
 
-        return collections;
+        Map<String, ? extends DataCollection> collections = createCollections(repositoryModels);
+        automatedDataSpace.getController().initialize(collectionModels, collections);
+
+        return collections.values();
     }
 
-    private Collection<CollectionModel> initializeSchemes(Collection<? extends DataCollectionStereotype> stereotypes) {
+    private Map<String, CollectionModel> initializeSchemes(Collection<? extends DataCollectionStereotype> stereotypes) {
         return stereotypes.stream()
                 .map(CollectionModel::of)
-                .collect(Collectors.toList());
+                .collect(Collectors.toMap(CollectionModel::getName, model -> model));
     }
 
-    private Collection<RepositoryModel> initializeRepositories(Collection<? extends CollectionModel> schemes) {
-        return schemes.stream()
+    private Collection<RepositoryModel> initializeRepositories(Map<String, ? extends CollectionModel> schemes) {
+        return schemes.values().stream()
                 .map(scheme -> REPOSITORY_FACTORY.createRepositoryScheme(injector, scheme))
                 .collect(Collectors.toList());
     }
@@ -104,10 +105,10 @@ final class AutomatedDataSpaceInitializer {
         };
     }
 
-    private Collection<? extends DataCollection> createCollections(Collection<RepositoryModel> schemes) {
+    private Map<String, ? extends DataCollection> createCollections(Collection<RepositoryModel> schemes) {
         return schemes.stream()
                 .map(scheme -> COLLECTION_FACTORY.createCollection(automatedDataSpace.getController(), injector, scheme))
-                .collect(Collectors.toList());
+                .collect(Collectors.toMap(DataCollection::getName, collection -> collection));
     }
 
 }

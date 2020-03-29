@@ -16,6 +16,7 @@
 
 package org.panda_lang.autodata.defaults.virtual;
 
+import io.vavr.control.Option;
 import org.panda_lang.autodata.data.collection.CollectionModel;
 import org.panda_lang.autodata.data.collection.DataCollection;
 import org.panda_lang.autodata.data.repository.DataController;
@@ -32,19 +33,16 @@ public final class InMemoryDataController implements DataController {
     private final Map<String, InMemoryDataHandler<?>> handlers = new HashMap<>();
 
     @Override
-    public void initializeSchemes(Collection<? extends CollectionModel> schemes) {
-        schemes.forEach(scheme -> handlers.put(scheme.getName(), new InMemoryDataHandler<>(this)));
-    }
-
-    @Override
-    public void initializeCollections(Collection<? extends DataCollection> dataCollections) {
-        dataCollections.forEach(dataCollection -> handlers.get(dataCollection.getName()).setCollection(dataCollection));
+    public void initialize(Map<String, ? extends CollectionModel> schemes, Map<String, ? extends DataCollection> dataCollections) {
+        for (DataCollection collection : dataCollections.values()) {
+            handlers.put(schemes.get(collection.getName()).getName(), new InMemoryDataHandler<>(this, collection));
+        }
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public <ENTITY> DataHandler<ENTITY> getHandler(String collection) {
-        return (DataHandler<ENTITY>) handlers.get(collection);
+    public <ENTITY> Option<DataHandler<ENTITY>> getHandler(String collection) {
+        return Option.of((DataHandler<ENTITY>) handlers.get(collection));
     }
 
     protected Collection<Object> getValues() {

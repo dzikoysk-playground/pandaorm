@@ -32,7 +32,7 @@ import java.lang.reflect.InvocationTargetException;
 public final class CollectionFactory {
 
     private static final EntityFactory ENTITY_FACTORY = new EntityFactory();
-    private static final org.panda_lang.autodata.data.repository.RepositoryFactory REPOSITORY_FACTORY = new RepositoryFactory();
+    private static final RepositoryFactory REPOSITORY_FACTORY = new RepositoryFactory();
 
     public DataCollection createCollection(DataController controller, Injector injector, RepositoryModel repositoryModel) {
         try {

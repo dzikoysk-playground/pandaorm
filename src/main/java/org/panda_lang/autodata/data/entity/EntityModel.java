@@ -22,12 +22,12 @@ import java.util.Optional;
 
 public class EntityModel {
 
-    private final Class<?> rootClass;
+    private final Class<?> entityType;
     private final Map<String, Property> properties;
     private final Collection<MethodModel> methods;
 
-    EntityModel(Class<?> rootClass, Map<String, Property> properties, Collection<MethodModel> methods) {
-        this.rootClass = rootClass;
+    EntityModel(Class<?> entityType, Map<String, Property> properties, Collection<MethodModel> methods) {
+        this.entityType = entityType;
         this.properties = properties;
         this.methods = methods;
     }
@@ -44,8 +44,8 @@ public class EntityModel {
         return properties;
     }
 
-    public Class<?> getRootClass() {
-        return rootClass;
+    public Class<?> getEntityType() {
+        return entityType;
     }
 
 }

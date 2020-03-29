@@ -18,21 +18,23 @@ package org.panda_lang.autodata.data.repository;
 
 import org.panda_lang.utilities.commons.function.ThrowingFunction;
 
+import java.util.function.Supplier;
+
 final class ProxyMethod {
 
     private final RepositoryOperation operationType;
-    private final ThrowingFunction<Object[], Object, Exception> function;
+    private final Supplier<ProxyFunction> function;
 
-    ProxyMethod(RepositoryOperation operationType, ThrowingFunction<Object[], Object, Exception> function) {
+    ProxyMethod(RepositoryOperation operationType, Supplier<ProxyFunction> function) {
         this.operationType = operationType;
         this.function = function;
     }
 
     protected Object apply(Object[] values) throws Exception {
-        return function.apply(values);
+        return function.get().apply(values);
     }
 
-    protected RepositoryOperation getOperationType() {
+    RepositoryOperation getOperationType() {
         return operationType;
     }
 

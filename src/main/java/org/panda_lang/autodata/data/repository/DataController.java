@@ -16,18 +16,17 @@
 
 package org.panda_lang.autodata.data.repository;
 
+import io.vavr.control.Option;
 import org.panda_lang.autodata.data.collection.CollectionModel;
 import org.panda_lang.autodata.data.collection.DataCollection;
 
-import java.util.Collection;
+import java.util.Map;
 
 public interface DataController {
 
-    void initializeSchemes(Collection<? extends CollectionModel> schemes);
+    void initialize(Map<String, ? extends CollectionModel> schemes, Map<String, ? extends DataCollection> dataCollections);
 
-    void initializeCollections(Collection<? extends DataCollection> dataCollections);
-
-    <ENTITY> DataHandler<ENTITY> getHandler(String collection);
+    <ENTITY> Option<DataHandler<ENTITY>> getHandler(String collection);
 
     String getIdentifier();
 
