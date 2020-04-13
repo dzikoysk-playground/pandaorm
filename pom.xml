@@ -18,8 +18,19 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.panda-lang</groupId>
-    <artifactId>panda-orm</artifactId>
+    <artifactId>panda-orm-parent</artifactId>
+    <packaging>pom</packaging>
     <version>1.0.0</version>
+
+    <modules>
+        <module>panda-orm-memory</module>
+        <module>panda-orm</module>
+        <module>panda-orm-sql</module>
+    </modules>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
 
     <dependencies>
         <dependency>
