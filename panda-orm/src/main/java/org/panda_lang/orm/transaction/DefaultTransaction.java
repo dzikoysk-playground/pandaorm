@@ -14,26 +14,17 @@
  * limitations under the License.
  */
 
-package org.panda_lang.orm.properties;
+package org.panda_lang.orm.transaction;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import org.panda_lang.orm.repository.DataHandler;
 
-@Target({ ElementType.METHOD })
-@Retention(RetentionPolicy.RUNTIME)
-public @interface Association {
+import java.util.Collections;
 
-    String name();
+public final class DefaultTransaction {
 
-    Relation relation();
-
-    enum Relation {
-
-        DIRECT,
-        MANY
-
+    public static <T> DataTransaction of(DataHandler<T> handler, T entity, DataModification modification) {
+        return new Transaction<>(handler, entity, null, () -> Collections.singletonList(modification))
+                .retry((attempt, time) -> attempt < 10 && time < 5000);
     }
 
 }

@@ -14,26 +14,32 @@
  * limitations under the License.
  */
 
-package org.panda_lang.orm.properties;
+package org.panda_lang.orm.entity;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.reflect.Method;
 
-@Target({ ElementType.METHOD })
-@Retention(RetentionPolicy.RUNTIME)
-public @interface Association {
+public final class MethodModel {
 
-    String name();
+    private final Method method;
+    private final MethodType type;
+    private final Property property;
 
-    Relation relation();
+    MethodModel(Method method, MethodType type, Property property) {
+        this.method = method;
+        this.property = property;
+        this.type = type;
+    }
 
-    enum Relation {
+    public Property getProperty() {
+        return property;
+    }
 
-        DIRECT,
-        MANY
+    public MethodType getType() {
+        return type;
+    }
 
+    public Method getMethod() {
+        return method;
     }
 
 }

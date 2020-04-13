@@ -16,16 +16,16 @@
 
 package org.panda_lang.orm.memory;
 
-import org.panda_lang.orm.AutomatedDataException;
-import org.panda_lang.orm.structure.collection.DataCollection;
-import org.panda_lang.orm.structure.entity.Property;
-import org.panda_lang.orm.structure.query.DataQuery;
-import org.panda_lang.orm.structure.query.DataQueryCategoryType;
-import org.panda_lang.orm.structure.query.DataQueryRule;
-import org.panda_lang.orm.structure.query.DataQueryRuleScheme;
-import org.panda_lang.orm.structure.query.DataRuleProperty;
-import org.panda_lang.orm.structure.repository.DataHandler;
-import org.panda_lang.orm.structure.transaction.DataTransactionResult;
+import org.panda_lang.orm.PandaOrmException;
+import org.panda_lang.orm.collection.DataCollection;
+import org.panda_lang.orm.entity.Property;
+import org.panda_lang.orm.query.DataQuery;
+import org.panda_lang.orm.query.DataQueryCategoryType;
+import org.panda_lang.orm.query.DataQueryRule;
+import org.panda_lang.orm.query.DataQueryRuleScheme;
+import org.panda_lang.orm.query.DataRuleProperty;
+import org.panda_lang.orm.repository.DataHandler;
+import org.panda_lang.orm.transaction.DataTransactionResult;
 import org.panda_lang.orm.properties.GenerationStrategy;
 import org.panda_lang.utilities.commons.ArrayUtils;
 import org.panda_lang.utilities.commons.ClassUtils;
@@ -125,7 +125,7 @@ final class InMemoryDataHandler<T> implements DataHandler<T> {
                     return false;
                 }
             } catch (NoSuchFieldException | IllegalAccessException e) {
-                throw new AutomatedDataException("Cannot invoke", e);
+                throw new PandaOrmException("Cannot invoke", e);
             }
         }
 

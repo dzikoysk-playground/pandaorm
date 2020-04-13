@@ -14,26 +14,32 @@
  * limitations under the License.
  */
 
-package org.panda_lang.orm.properties;
+package org.panda_lang.orm.entity;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import org.panda_lang.orm.utils.Annotations;
 
-@Target({ ElementType.METHOD })
-@Retention(RetentionPolicy.RUNTIME)
-public @interface Association {
+public final class Property {
 
-    String name();
+    private final String name;
+    private final Class<?> type;
+    private final Annotations annotations;
 
-    Relation relation();
+    Property(String name, Class<?> type, Annotations annotations) {
+        this.name = name;
+        this.type = type;
+        this.annotations = annotations;
+    }
 
-    enum Relation {
+    public Annotations getAnnotations() {
+        return annotations;
+    }
 
-        DIRECT,
-        MANY
+    public Class<?> getType() {
+        return type;
+    }
 
+    public String getName() {
+        return name;
     }
 
 }

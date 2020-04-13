@@ -21,19 +21,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target({ ElementType.METHOD })
+@Target({ ElementType.TYPE })
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Association {
-
-    String name();
-
-    Relation relation();
-
-    enum Relation {
-
-        DIRECT,
-        MANY
-
-    }
+public @interface Repository {
 
 }

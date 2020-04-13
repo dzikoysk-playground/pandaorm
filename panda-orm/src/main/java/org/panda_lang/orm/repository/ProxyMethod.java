@@ -14,26 +14,26 @@
  * limitations under the License.
  */
 
-package org.panda_lang.orm.properties;
+package org.panda_lang.orm.repository;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.util.function.Supplier;
 
-@Target({ ElementType.METHOD })
-@Retention(RetentionPolicy.RUNTIME)
-public @interface Association {
+final class ProxyMethod {
 
-    String name();
+    private final RepositoryOperation operationType;
+    private final Supplier<ProxyFunction> function;
 
-    Relation relation();
+    ProxyMethod(RepositoryOperation operationType, Supplier<ProxyFunction> function) {
+        this.operationType = operationType;
+        this.function = function;
+    }
 
-    enum Relation {
+    protected Object apply(Object[] values) throws Exception {
+        return function.get().apply(values);
+    }
 
-        DIRECT,
-        MANY
-
+    RepositoryOperation getOperationType() {
+        return operationType;
     }
 
 }

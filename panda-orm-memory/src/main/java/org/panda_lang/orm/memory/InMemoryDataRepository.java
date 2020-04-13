@@ -16,7 +16,7 @@
 
 package org.panda_lang.orm.memory;
 
-import org.panda_lang.orm.structure.repository.DataRepository;
+import org.panda_lang.orm.repository.DataRepository;
 
 public interface InMemoryDataRepository<T> extends DataRepository<T> {
 

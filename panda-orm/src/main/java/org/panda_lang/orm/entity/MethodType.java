@@ -14,26 +14,34 @@
  * limitations under the License.
  */
 
-package org.panda_lang.orm.properties;
+package org.panda_lang.orm.entity;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+public enum MethodType {
 
-@Target({ ElementType.METHOD })
-@Retention(RetentionPolicy.RUNTIME)
-public @interface Association {
+    GET,
+    SET,
 
-    String name();
+    ADD,
+    REMOVE,
 
-    Relation relation();
+    IS,
+    HAS,
+    CONTAINS,
 
-    enum Relation {
+    CREATE,
+    DELETE,
 
-        DIRECT,
-        MANY
+    UPDATE,
+    FIND;
 
+    public static MethodType of(String name) {
+        for (MethodType value : values()) {
+            if (value.name().equalsIgnoreCase(name)) {
+                return value;
+            }
+        }
+
+        return null;
     }
 
 }

@@ -14,26 +14,20 @@
  * limitations under the License.
  */
 
-package org.panda_lang.orm.properties;
+package org.panda_lang.orm.repository;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import io.vavr.control.Option;
+import org.panda_lang.orm.collection.CollectionModel;
+import org.panda_lang.orm.collection.DataCollection;
 
-@Target({ ElementType.METHOD })
-@Retention(RetentionPolicy.RUNTIME)
-public @interface Association {
+import java.util.Map;
 
-    String name();
+public interface DataController {
 
-    Relation relation();
+    Map<String, ? extends DataCollection> initialize(Map<String, ? extends CollectionModel> models, Map<String, ? extends DataCollection> collections);
 
-    enum Relation {
+    <ENTITY> Option<DataHandler<ENTITY>> getHandler(String collection);
 
-        DIRECT,
-        MANY
-
-    }
+    String getIdentifier();
 
 }

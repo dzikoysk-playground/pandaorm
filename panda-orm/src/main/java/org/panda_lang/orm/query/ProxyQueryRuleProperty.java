@@ -14,26 +14,20 @@
  * limitations under the License.
  */
 
-package org.panda_lang.orm.properties;
+package org.panda_lang.orm.query;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+final class ProxyQueryRuleProperty implements DataRuleProperty {
 
-@Target({ ElementType.METHOD })
-@Retention(RetentionPolicy.RUNTIME)
-public @interface Association {
+    private final Object property;
 
-    String name();
+    public ProxyQueryRuleProperty(Object property) {
+        this.property = property;
+    }
 
-    Relation relation();
-
-    enum Relation {
-
-        DIRECT,
-        MANY
-
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T> T getValue() {
+        return (T) property;
     }
 
 }

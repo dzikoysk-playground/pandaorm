@@ -14,26 +14,21 @@
  * limitations under the License.
  */
 
-package org.panda_lang.orm.properties;
+package org.panda_lang.orm.sql.containers;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import org.panda_lang.orm.collection.DataCollection;
 
-@Target({ ElementType.METHOD })
-@Retention(RetentionPolicy.RUNTIME)
-public @interface Association {
+import java.util.HashMap;
 
-    String name();
+public final class AssociativeTable extends Table {
 
-    Relation relation();
+    private final Table a;
+    private final Table b;
 
-    enum Relation {
-
-        DIRECT,
-        MANY
-
+    public AssociativeTable(String name, DataCollection collection, Table a, Table b) {
+        super(name, collection, new HashMap<>());
+        this.a = a;
+        this.b = b;
     }
 
 }

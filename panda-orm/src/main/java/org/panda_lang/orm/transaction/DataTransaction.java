@@ -14,26 +14,16 @@
  * limitations under the License.
  */
 
-package org.panda_lang.orm.properties;
+package org.panda_lang.orm.transaction;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+public interface DataTransaction {
 
-@Target({ ElementType.METHOD })
-@Retention(RetentionPolicy.RUNTIME)
-public @interface Association {
+    DataTransaction retry(DataTransactionCondition retry);
 
-    String name();
+    DataTransaction success(org.panda_lang.orm.transaction.DataTransactionAction success);
 
-    Relation relation();
+    DataTransaction orElse(DataTransactionAction orElse);
 
-    enum Relation {
-
-        DIRECT,
-        MANY
-
-    }
+    void commit();
 
 }

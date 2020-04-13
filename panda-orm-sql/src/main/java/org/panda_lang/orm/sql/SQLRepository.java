@@ -16,7 +16,7 @@
 
 package org.panda_lang.orm.sql;
 
-import org.panda_lang.orm.structure.repository.DataRepository;
+import org.panda_lang.orm.repository.DataRepository;
 
 public interface SQLRepository<T> extends DataRepository<T> {
 

@@ -14,26 +14,20 @@
  * limitations under the License.
  */
 
-package org.panda_lang.orm.properties;
+package org.panda_lang.orm;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+public class PandaOrmException extends RuntimeException {
 
-@Target({ ElementType.METHOD })
-@Retention(RetentionPolicy.RUNTIME)
-public @interface Association {
+    public PandaOrmException(String message) {
+        super(message);
+    }
 
-    String name();
+    public PandaOrmException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
-    Relation relation();
-
-    enum Relation {
-
-        DIRECT,
-        MANY
-
+    public PandaOrmException(Throwable cause) {
+        super(cause);
     }
 
 }

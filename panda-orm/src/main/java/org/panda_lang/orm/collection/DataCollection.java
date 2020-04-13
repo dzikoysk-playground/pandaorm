@@ -14,26 +14,14 @@
  * limitations under the License.
  */
 
-package org.panda_lang.orm.properties;
+package org.panda_lang.orm.collection;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+public interface DataCollection {
 
-@Target({ ElementType.METHOD })
-@Retention(RetentionPolicy.RUNTIME)
-public @interface Association {
+    <R> R getRepository(Class<R> service);
 
-    String name();
+    Class<?> getEntityClass();
 
-    Relation relation();
-
-    enum Relation {
-
-        DIRECT,
-        MANY
-
-    }
+    String getName();
 
 }

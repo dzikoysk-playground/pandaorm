@@ -14,40 +14,54 @@
  * limitations under the License.
  */
 
-package org.panda_lang.orm.memory;
+package org.panda_lang.orm.sql;
 
+import com.zaxxer.hikari.HikariDataSource;
 import io.vavr.control.Option;
 import org.panda_lang.orm.collection.CollectionModel;
 import org.panda_lang.orm.collection.DataCollection;
 import org.panda_lang.orm.repository.DataController;
 import org.panda_lang.orm.repository.DataHandler;
+import org.panda_lang.orm.serialization.Type;
+import org.panda_lang.orm.sql.containers.Table;
+import org.panda_lang.utilities.commons.ObjectUtils;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-public final class InMemoryDataController implements DataController {
+public final class DatabaseController implements DataController {
 
-    private final Map<String, InMemoryDataHandler<?>> handlers = new HashMap<>();
+    private final HikariDataSource dataSource;
+    private final Map<String, TableHandler<?>> tables = new HashMap<>();
+
+
+    public DatabaseController(HikariDataSource dataSource) {
+        this.dataSource = dataSource;
+    }
 
     @Override
     public Map<String, ? extends DataCollection> initialize(Map<String, ? extends CollectionModel> models, Map<String, ? extends DataCollection> collections) {
-        for (DataCollection collection : collections.values()) {
-            handlers.put(models.get(collection.getName()).getName(), new InMemoryDataHandler<>(this, collection));
-        }
+        Map<Class<?>, Type<?>> types = new HashMap<>();
+
+        EntityTableLoader entityTableLoader = new EntityTableLoader(types);
+        Collection<Table> tablesOfModels = entityTableLoader.loadModels(models, collections);
+
+        System.out.println("Generated handlers for tables: ");
+        tablesOfModels.forEach(table -> tables.put(table.getName(), new TableHandler<>(table)));
+        tables.values().forEach(System.out::println);
 
         return collections;
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public <ENTITY> Option<DataHandler<ENTITY>> getHandler(String collection) {
-        return Option.of((DataHandler<ENTITY>) handlers.get(collection));
+        return Option.of(ObjectUtils.cast(tables.get(collection)));
     }
-
 
     @Override
     public String getIdentifier() {
-        return "InMemory";
+        return "sql";
     }
 
 }

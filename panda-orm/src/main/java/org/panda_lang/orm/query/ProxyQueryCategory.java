@@ -14,26 +14,28 @@
  * limitations under the License.
  */
 
-package org.panda_lang.orm.properties;
+package org.panda_lang.orm.query;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.util.List;
 
-@Target({ ElementType.METHOD })
-@Retention(RetentionPolicy.RUNTIME)
-public @interface Association {
+final class ProxyQueryCategory implements DataQueryCategory {
 
-    String name();
+    private final DataQueryCategoryType type;
+    private final List<? extends DataQueryRuleScheme> elements;
 
-    Relation relation();
+    ProxyQueryCategory(DataQueryCategoryType type, List<? extends DataQueryRuleScheme> elements) {
+        this.type = type;
+        this.elements = elements;
+    }
 
-    enum Relation {
+    @Override
+    public List<? extends DataQueryRuleScheme> getElements() {
+        return elements;
+    }
 
-        DIRECT,
-        MANY
-
+    @Override
+    public String getName() {
+        return type.getName();
     }
 
 }

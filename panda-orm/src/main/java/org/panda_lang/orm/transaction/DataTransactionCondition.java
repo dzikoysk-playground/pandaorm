@@ -14,26 +14,14 @@
  * limitations under the License.
  */
 
-package org.panda_lang.orm.properties;
+package org.panda_lang.orm.transaction;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.util.function.BiPredicate;
 
-@Target({ ElementType.METHOD })
-@Retention(RetentionPolicy.RUNTIME)
-public @interface Association {
+@FunctionalInterface
+public interface DataTransactionCondition extends BiPredicate<Integer, Integer> {
 
-    String name();
-
-    Relation relation();
-
-    enum Relation {
-
-        DIRECT,
-        MANY
-
-    }
+    @Override
+    boolean test(Integer attempt, Integer time);
 
 }

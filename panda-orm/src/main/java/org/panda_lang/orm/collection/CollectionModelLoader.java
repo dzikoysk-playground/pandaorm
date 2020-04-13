@@ -14,26 +14,16 @@
  * limitations under the License.
  */
 
-package org.panda_lang.orm.properties;
+package org.panda_lang.orm.collection;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import org.panda_lang.orm.entity.EntityFactory;
 
-@Target({ ElementType.METHOD })
-@Retention(RetentionPolicy.RUNTIME)
-public @interface Association {
+final class CollectionModelLoader {
 
-    String name();
+    private static final EntityFactory ENTITY_FACTORY = new EntityFactory();
 
-    Relation relation();
-
-    enum Relation {
-
-        DIRECT,
-        MANY
-
+    public CollectionModel load(DataCollectionConfiguration stereotype) {
+        return new CollectionModel(stereotype, ENTITY_FACTORY.createEntityScheme(stereotype.getEntityClass()));
     }
 
 }

@@ -30,6 +30,23 @@
             <artifactId>panda-orm</artifactId>
             <version>1.0.0</version>
         </dependency>
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>3.4.2</version>
+        </dependency>
+        <dependency>
+            <groupId>ca.krasnay</groupId>
+            <artifactId>sqlbuilder</artifactId>
+            <version>1.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.4.200</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
 </project>

@@ -14,26 +14,18 @@
  * limitations under the License.
  */
 
-package org.panda_lang.orm.properties;
+package org.panda_lang.orm.query;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import org.panda_lang.orm.entity.EntityModel;
 
-@Target({ ElementType.METHOD })
-@Retention(RetentionPolicy.RUNTIME)
-public @interface Association {
+import java.lang.reflect.Method;
 
-    String name();
+public final class DataQueryFactory {
 
-    Relation relation();
+    private static final ProxyQueryParser PROXY_QUERY_PARSER = new ProxyQueryParser();
 
-    enum Relation {
-
-        DIRECT,
-        MANY
-
+    public DataQuery create(EntityModel scheme, Method method) {
+        return PROXY_QUERY_PARSER.parse(scheme, method);
     }
 
 }

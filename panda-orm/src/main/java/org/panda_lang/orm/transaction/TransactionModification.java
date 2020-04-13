@@ -14,26 +14,26 @@
  * limitations under the License.
  */
 
-package org.panda_lang.orm.properties;
+package org.panda_lang.orm.transaction;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+public final class TransactionModification implements DataModification {
 
-@Target({ ElementType.METHOD })
-@Retention(RetentionPolicy.RUNTIME)
-public @interface Association {
+    private final String property;
+    private final Object value;
 
-    String name();
+    public TransactionModification(String property, Object value) {
+        this.property = property;
+        this.value = value;
+    }
 
-    Relation relation();
+    @Override
+    public Object getValue() {
+        return value;
+    }
 
-    enum Relation {
-
-        DIRECT,
-        MANY
-
+    @Override
+    public String getProperty() {
+        return property;
     }
 
 }

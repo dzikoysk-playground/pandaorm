@@ -14,26 +14,14 @@
  * limitations under the License.
  */
 
-package org.panda_lang.orm.properties;
+package org.panda_lang.orm.query;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import org.panda_lang.utilities.commons.collection.Pair;
 
-@Target({ ElementType.METHOD })
-@Retention(RetentionPolicy.RUNTIME)
-public @interface Association {
+import java.util.List;
 
-    String name();
+public interface DataQueryRule {
 
-    Relation relation();
-
-    enum Relation {
-
-        DIRECT,
-        MANY
-
-    }
+    List<Pair<DataRuleProperty, Object>> getProperties();
 
 }

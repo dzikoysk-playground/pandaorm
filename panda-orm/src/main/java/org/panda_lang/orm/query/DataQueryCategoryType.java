@@ -14,26 +14,32 @@
  * limitations under the License.
  */
 
-package org.panda_lang.orm.properties;
+package org.panda_lang.orm.query;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+public enum DataQueryCategoryType {
 
-@Target({ ElementType.METHOD })
-@Retention(RetentionPolicy.RUNTIME)
-public @interface Association {
+    WHAT("what"),
+    BY("by"),
+    ORDER("order");
 
-    String name();
+    private final String name;
 
-    Relation relation();
+    DataQueryCategoryType(String name) {
+        this.name = name;
+    }
 
-    enum Relation {
+    public String getName() {
+        return name;
+    }
 
-        DIRECT,
-        MANY
+    public static DataQueryCategoryType of(String name) {
+        for (DataQueryCategoryType value : values()) {
+            if (name.equals(value.getName())) {
+                return value;
+            }
+        }
 
+        return null;
     }
 
 }
