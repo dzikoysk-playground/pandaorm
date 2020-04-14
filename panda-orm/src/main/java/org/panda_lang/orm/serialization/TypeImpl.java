@@ -16,16 +16,20 @@
 
 package org.panda_lang.orm.serialization;
 
+import java.util.function.BiFunction;
+
 public class TypeImpl<T> implements Type<T> {
 
     private final Class<T> type;
     private final Serializer<T> serializer;
     private final Deserializer<T> deserializer;
+    private final BiFunction<Type<T>, Metadata, String> toString;
 
-    public TypeImpl(Class<T> type, Serializer<T> serializer, Deserializer<T> deserializer) {
+    public TypeImpl(Class<T> type, Serializer<T> serializer, Deserializer<T> deserializer, BiFunction<Type<T>, Metadata, String> toString) {
         this.type = type;
         this.serializer = serializer;
         this.deserializer = deserializer;
+        this.toString = toString;
     }
 
     @Override
@@ -41,6 +45,11 @@ public class TypeImpl<T> implements Type<T> {
     @Override
     public Class<T> getTypeClass() {
         return type;
+    }
+
+    @Override
+    public String asString(Metadata metadata) {
+        return toString.apply(this, metadata);
     }
 
 }

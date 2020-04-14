@@ -17,6 +17,7 @@
 package org.panda_lang.orm.sql.containers;
 
 import org.panda_lang.orm.collection.DataCollection;
+import org.panda_lang.utilities.commons.ValidationUtils;
 
 import java.util.Map;
 
@@ -25,11 +26,17 @@ public class Table {
     private final String name;
     private final DataCollection collection;
     private final Map<String, Column<?>> columns;
+    private final Column<?> primary;
 
     public Table(String name, DataCollection collection, Map<String, Column<?>> columns) {
         this.name = name;
         this.collection = collection;
         this.columns = columns;
+        this.primary = ValidationUtils.notNull(ColumnUtils.selectPrimary(this), "Missing primary column in table " + name);
+    }
+
+    public Column<?> getPrimary() {
+        return primary;
     }
 
     public Map<String, ? extends Column<?>> getColumns() {

@@ -21,9 +21,11 @@ import org.panda_lang.orm.collection.DataCollection;
 import org.panda_lang.orm.collection.DataCollectionImpl;
 import org.panda_lang.orm.properties.Association;
 import org.panda_lang.orm.properties.Association.Relation;
+import org.panda_lang.orm.properties.AutoIncrement;
 import org.panda_lang.orm.properties.Id;
 import org.panda_lang.orm.properties.NonNull;
 import org.panda_lang.orm.properties.Unique;
+import org.panda_lang.orm.serialization.MetadataImpl;
 import org.panda_lang.orm.serialization.Type;
 import org.panda_lang.orm.sql.containers.AssociativeRepository;
 import org.panda_lang.orm.sql.containers.AssociativeTable;
@@ -32,9 +34,10 @@ import org.panda_lang.orm.sql.containers.Table;
 import org.panda_lang.orm.utils.Annotations;
 import org.panda_lang.utilities.commons.collection.Pair;
 
-import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
 
 final class EntityTableLoader {
 
@@ -44,8 +47,8 @@ final class EntityTableLoader {
         this.types = types;
     }
 
-    Collection<Table> loadModels(Map<String, ? extends CollectionModel> models, Map<String, ? extends DataCollection> collections) {
-        Map<String, Table> tables = new HashMap<>();
+    Map<String, Table> loadModels(Map<String, ? extends CollectionModel> models, Map<String, ? extends DataCollection> collections) {
+        Map<String, Table> tables = new LinkedHashMap<>();
         Map<String, Pair<String, String>> associative = new HashMap<>();
 
         for (CollectionModel model : models.values()) {
@@ -58,10 +61,10 @@ final class EntityTableLoader {
             Table valueTable = tables.get(pair.getValue());
 
             DataCollection associativeCollection = new DataCollectionImpl(name, Pair.class, new AssociativeRepository());
-            tables.put(name, new AssociativeTable(name, associativeCollection, keyTable, valueTable));
+            tables.put(name, AssociativeTable.create(name, associativeCollection, keyTable, valueTable));
         });
 
-        return tables.values();
+        return tables;
     }
 
     Table loadTable(CollectionModel model, DataCollection collection, Map<String, Pair<String, String>> associative) {
@@ -69,27 +72,34 @@ final class EntityTableLoader {
 
         model.getEntityModel().getProperties().forEach((name, property) -> {
             Annotations annotations = property.getAnnotations();
+            Optional<Association> associationValue = annotations.getAnnotation(Association.class);
+
+            if (associationValue.isPresent()) {
+                Association association = associationValue.get();
+
+                if (association.relation() == Relation.MANY) {
+                    Pair<String, String> content = new Pair<>(model.getName(), association.name());
+                    associative.put(property.getName(), content);
+                    return;
+                }
+
+                // todo: direct assoc col
+                return;
+            }
 
             Column<?> column = new Column<>(
                     name,
                     types.get(property.getType()),
+                    new MetadataImpl(),
                     annotations.getAnnotation(Id.class).isPresent(),
                     annotations.getAnnotation(Unique.class).isPresent(),
-                    annotations.getAnnotation(NonNull.class).isPresent()
+                    annotations.getAnnotation(NonNull.class).isPresent(),
+                    annotations.getAnnotation(AutoIncrement.class).isPresent(),
+                    null
             );
 
             columns.put(column.getName(), column);
         });
-
-        model.getEntityModel().getProperties().forEach((name, property) -> {
-            property.getAnnotations().getAnnotation(Association.class)
-                    .filter(association -> association.relation() == Relation.MANY)
-                    .ifPresent(association -> {
-                        Pair<String, String> content = new Pair<>(model.getName(), association.name());
-                        associative.put(property.getName(), content);
-                    });
-        });
-
 
         return new Table(model.getName(), collection, columns);
     }

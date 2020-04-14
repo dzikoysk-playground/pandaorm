@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 
-package org.panda_lang.orm.sql;
+package org.panda_lang.orm.properties;
 
-import org.panda_lang.orm.repository.DataRepository;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
-public interface SQLRepository<T> extends DataRepository<T> {
+@Retention(RetentionPolicy.RUNTIME)
+public @interface AutoIncrement {
 
 }

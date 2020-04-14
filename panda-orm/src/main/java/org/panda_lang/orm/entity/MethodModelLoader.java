@@ -44,7 +44,7 @@ final class MethodModelLoader {
         boolean collection = false;
 
         if (Collection.class.isAssignableFrom(propertyType)) {
-            propertyName = propertyName.substring(0, propertyName.length() - 1);
+            // propertyName = propertyName.substring(0, propertyName.length() - 1); // remove plural
             collection = true;
         }
 
@@ -57,8 +57,6 @@ final class MethodModelLoader {
                 if (!associationValue.isPresent()) {
                     throw new PandaOrmException("Collection based method requires @Association annotation");
                 }
-
-                Association association = associationValue.get();
 
                 Property property = new Property(propertyName, propertyType, annotations);
                 properties.put(propertyName, property);
@@ -91,6 +89,9 @@ final class MethodModelLoader {
             case SET:
             case UPDATE:
             case DELETE:
+                return method.getParameterTypes()[0];
+            case ADD:
+                System.out.println("ADD");
                 return method.getParameterTypes()[0];
             default:
                 throw new PandaOrmException("Unsupported operation '" + operationType + "'");

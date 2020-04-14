@@ -69,7 +69,12 @@ final class PandaOrmInitializer {
                 .annotatedWith(Berry.class).assignHandler(initializeBerry(repositoryModels));
 
         Map<String, ? extends DataCollection> collections = createCollections(repositoryModels);
-        collections = pandaORM.getController().initialize(collectionModels, collections);
+
+        try {
+            collections = pandaORM.getController().initialize(collectionModels, collections);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         return collections.values();
     }

@@ -24,9 +24,9 @@ import java.util.Map;
 
 public interface DataController {
 
-    Map<String, ? extends DataCollection> initialize(Map<String, ? extends CollectionModel> models, Map<String, ? extends DataCollection> collections);
+    Map<String, ? extends DataCollection> initialize(Map<String, ? extends CollectionModel> models, Map<String, ? extends DataCollection> collections) throws Exception;
 
-    <ENTITY> Option<DataHandler<ENTITY>> getHandler(String collection);
+    <ENTITY> Option<? extends DataHandler<ENTITY>> getHandler(String collection);
 
     String getIdentifier();
 

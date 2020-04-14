@@ -14,13 +14,21 @@
  * limitations under the License.
  */
 
-package org.panda_lang.orm.sql.containers;
+package org.panda_lang.orm.sql.types;
 
-final class MetadataImpl implements Metadata {
+import org.panda_lang.orm.serialization.Type;
+import org.panda_lang.orm.serialization.TypeImpl;
 
-    @Override
-    public <T> T getProperty(String key) {
-        return null;
-    }
+import java.util.UUID;
 
+public final class UUIDType {
+
+    public static final Type<UUID> UUID_TYPE = new TypeImpl<>(
+            UUID.class,
+            (type, uuid) -> uuid.toString(),
+            (type, value) -> UUID.fromString(value),
+            (stringType, metadata) -> "INT"
+    );
+
+    private UUIDType() { }
 }

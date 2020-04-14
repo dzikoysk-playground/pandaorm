@@ -16,22 +16,54 @@
 
 package org.panda_lang.orm.sql.containers;
 
+import io.vavr.control.Option;
+import org.jetbrains.annotations.Nullable;
+import org.panda_lang.orm.serialization.Metadata;
 import org.panda_lang.orm.serialization.Type;
+import org.panda_lang.utilities.commons.ValidationUtils;
+import org.panda_lang.utilities.commons.collection.Pair;
 
-public final class Column<T> {
+public final class Column<T> implements Comparable<Column<T>> {
 
     private final String name;
     private final Type<T> type;
+    private final Metadata metadata;
     private final boolean primary;
     private final boolean unique;
     private final boolean notNull;
+    private final boolean autoIncrement;
+    private final Option<Pair<Table, Column<?>>> references;
 
-    public Column(String name, Type<T> type, boolean primary, boolean unique, boolean notNull) {
-        this.name = name;
-        this.type = type;
+    public Column(String name, Type<T> type, Metadata metadata, boolean primary, boolean unique, boolean notNull, boolean autoIncrement, @Nullable Pair<Table, Column<?>> references) {
+        this.name = ValidationUtils.notNull(name, "Undefined name");
+        this.type = ValidationUtils.notNull(type, "Undefined type in column " + name);
+        this.metadata = ValidationUtils.notNull(metadata, "Undefined metadata in column " + name);
         this.primary = primary;
         this.unique = unique;
         this.notNull = notNull;
+        this.autoIncrement = autoIncrement;
+        this.references = Option.of(references);
+    }
+
+    public Column<T> copy(String customName) {
+        return new Column<>(customName, type, metadata, primary, unique, notNull, autoIncrement, references.get());
+    }
+
+    @Override
+    public int compareTo(Column<T> o) {
+        if (primary) {
+            return o.primary ? name.compareTo(o.name) : -1;
+        }
+
+        if (references.isDefined()) {
+            return o.references.isDefined() ? name.compareTo(o.name) : 1;
+        }
+
+        return name.compareTo(o.name);
+    }
+
+    public boolean isForeign() {
+        return references.isDefined();
     }
 
     public boolean isNotNull() {
@@ -46,12 +78,30 @@ public final class Column<T> {
         return primary;
     }
 
+    public Option<Pair<Table, Column<?>>> getReferences() {
+        return references;
+    }
+
+    public Metadata getMetadata() {
+        return metadata;
+    }
+
     public Type<T> getType() {
         return type;
     }
 
     public String getName() {
         return name;
+    }
+
+    @Override
+    public String toString() {
+        return getName() + " " + getType().asString(metadata)
+                + (notNull ? " NOT NULL" : "")
+                + (unique ? " UNIQUE" : "")
+                + (primary ? " PRIMARY KEY" : "")
+                + (autoIncrement ? " AUTO_INCREMENT" : "");
+                // + references.map(pair -> " FOREIGN KEY REFERENCES " + pair.getKey().getName() + "(" + pair.getValue().getName() + ")").getOrElse(""); coz mysql sucks
     }
 
 }

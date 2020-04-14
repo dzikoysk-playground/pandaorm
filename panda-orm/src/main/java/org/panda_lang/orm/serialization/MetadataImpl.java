@@ -16,14 +16,21 @@
 
 package org.panda_lang.orm.serialization;
 
-public interface Type<T> {
+import java.util.HashMap;
+import java.util.Map;
 
-    Deserializer<T> getDeserializer();
+public final class MetadataImpl implements Metadata {
 
-    Serializer<T> getSerializer();
+    private final Map<String, Object> metadata = new HashMap<>();
 
-    Class<T> getTypeClass();
+    @Override
+    public boolean containsProperty(String key) {
+        return false;
+    }
 
-    String asString(Metadata metadata);
+    @Override
+    public <T> T getProperty(String key) {
+        return null;
+    }
 
 }

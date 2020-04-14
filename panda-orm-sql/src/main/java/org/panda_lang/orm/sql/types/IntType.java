@@ -14,16 +14,20 @@
  * limitations under the License.
  */
 
-package org.panda_lang.orm.serialization;
+package org.panda_lang.orm.sql.types;
 
-public interface Type<T> {
+import org.panda_lang.orm.serialization.Type;
+import org.panda_lang.orm.serialization.TypeImpl;
 
-    Deserializer<T> getDeserializer();
+public final class IntType {
 
-    Serializer<T> getSerializer();
+    public static final Type<Integer> INT_TYPE = new TypeImpl<>(
+            Integer.class,
+            (type, integer) -> integer.toString(),
+            (type, value) -> Integer.parseInt(value),
+            (stringType, metadata) -> "INT"
+    );
 
-    Class<T> getTypeClass();
-
-    String asString(Metadata metadata);
+    private IntType() { }
 
 }

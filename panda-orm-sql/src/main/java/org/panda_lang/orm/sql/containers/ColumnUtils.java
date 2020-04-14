@@ -16,8 +16,18 @@
 
 package org.panda_lang.orm.sql.containers;
 
-public interface Metadata {
+import org.jetbrains.annotations.Nullable;
 
-    <T> T getProperty(String key);
+final class ColumnUtils {
+
+    private ColumnUtils() { }
+
+    public static @Nullable Column<?> selectPrimary(Table table) {
+        return table.getColumns().values().stream()
+                .filter(Column::isPrimary)
+                .findAny()
+                .orElse(null);
+    }
+
 
 }

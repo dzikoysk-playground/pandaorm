@@ -38,14 +38,14 @@ import java.util.UUID;
 final class DatabaseControllerTest {
 
     @Test
-    void testSQL() throws Exception {
+    void testSQL() {
         UnsafeUtils.disableIllegalAccessMessage();
 
         HikariConfig config = new HikariConfig();
         config.setDriverClassName("org.h2.Driver");
-        config.setJdbcUrl("jdbc:h2:mem:");
-        config.setUsername("");
-        config.setPassword("");
+        config.setJdbcUrl("jdbc:h2:mem:test-database");
+        config.setUsername("sa");
+        config.setPassword("sa");
         HikariDataSource dataSource = new HikariDataSource(config);
 
         PandaOrm orm = PandaOrm.initialize(new DatabaseController(dataSource))
@@ -86,7 +86,7 @@ final class DatabaseControllerTest {
     }
 
     @Repository
-    public interface GroupRepository extends SQLRepository<Group> {
+    public interface GroupRepository extends SqlRepository<Group> {
 
     }
 
@@ -94,7 +94,6 @@ final class DatabaseControllerTest {
     public interface User extends DataEntity {
 
         void setName(String name);
-
         String getName();
 
         @Id
@@ -104,7 +103,7 @@ final class DatabaseControllerTest {
     }
 
     @Repository
-    public interface UserRepository extends SQLRepository<User> {
+    public interface UserRepository extends SqlRepository<User> {
 
         User createUser(@As("name") String name);
 

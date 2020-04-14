@@ -16,5 +16,15 @@
 
 package org.panda_lang.orm.sql;
 
+import org.panda_lang.orm.sql.containers.Table;
+
+import java.util.Collections;
+import java.util.Map;
+
 final class RemoteTableLoader {
+
+    Map<String, Table> loadTables() {
+        return Collections.emptyMap();
+    }
+
 }

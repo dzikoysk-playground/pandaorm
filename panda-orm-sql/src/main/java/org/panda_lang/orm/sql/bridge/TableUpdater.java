@@ -14,16 +14,21 @@
  * limitations under the License.
  */
 
-package org.panda_lang.orm.serialization;
+package org.panda_lang.orm.sql.bridge;
 
-public interface Type<T> {
+import com.zaxxer.hikari.HikariDataSource;
+import org.panda_lang.orm.sql.containers.Table;
 
-    Deserializer<T> getDeserializer();
+public final class TableUpdater {
 
-    Serializer<T> getSerializer();
+    private final HikariDataSource dataSource;
 
-    Class<T> getTypeClass();
+    public TableUpdater(HikariDataSource dataSource) {
+        this.dataSource = dataSource;
+    }
 
-    String asString(Metadata metadata);
+    public void update(Table entityTable, Table remoteTable) {
+
+    }
 
 }

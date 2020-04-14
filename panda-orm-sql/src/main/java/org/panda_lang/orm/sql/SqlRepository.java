@@ -14,16 +14,10 @@
  * limitations under the License.
  */
 
-package org.panda_lang.orm.serialization;
+package org.panda_lang.orm.sql;
 
-public interface Type<T> {
+import org.panda_lang.orm.repository.DataRepository;
 
-    Deserializer<T> getDeserializer();
-
-    Serializer<T> getSerializer();
-
-    Class<T> getTypeClass();
-
-    String asString(Metadata metadata);
+public interface SqlRepository<T> extends DataRepository<T> {
 
 }

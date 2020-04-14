@@ -16,8 +16,18 @@
 
 package org.panda_lang.orm.sql.types;
 
+import org.panda_lang.orm.serialization.Type;
+import org.panda_lang.orm.serialization.TypeImpl;
+
 public final class StringType {
 
+    public static final Type<String> STRING_TYPE = new TypeImpl<>(
+            String.class,
+            (type, text) -> text,
+            (type, value) -> value,
+            (stringType, metadata) ->  metadata.containsProperty("varchar") ? "VARCHAR(" + metadata.getProperty("varchar") + ")" : "TEXT"
+    );
 
+    private StringType() { }
 
 }

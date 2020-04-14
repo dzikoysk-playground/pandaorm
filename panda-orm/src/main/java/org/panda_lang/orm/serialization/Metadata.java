@@ -16,14 +16,10 @@
 
 package org.panda_lang.orm.serialization;
 
-public interface Type<T> {
+public interface Metadata {
 
-    Deserializer<T> getDeserializer();
+    boolean containsProperty(String key);
 
-    Serializer<T> getSerializer();
-
-    Class<T> getTypeClass();
-
-    String asString(Metadata metadata);
+    <T> T getProperty(String key);
 
 }
