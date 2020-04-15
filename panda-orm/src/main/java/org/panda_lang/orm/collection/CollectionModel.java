@@ -25,7 +25,7 @@ public class CollectionModel {
     private final DataCollectionConfiguration configuration;
     private final EntityModel entityModel;
 
-    CollectionModel(DataCollectionConfiguration configuration, EntityModel entityModel) {
+    public CollectionModel(DataCollectionConfiguration configuration, EntityModel entityModel) {
         this.configuration = configuration;
         this.entityModel = entityModel;
     }

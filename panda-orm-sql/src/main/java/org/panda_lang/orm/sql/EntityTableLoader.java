@@ -67,7 +67,8 @@ final class EntityTableLoader {
             Table keyTable = tables.get(pair.getKey());
             Table valueTable = tables.get(pair.getValue());
 
-            DataCollection associativeCollection = new DataCollectionImpl(name, Pair.class, new AssociativeRepository());
+            //CollectionModel collectionModel = new CollectionModel();
+            DataCollection associativeCollection = new DataCollectionImpl(name, null, new AssociativeRepository(), Pair.class);
             tables.put(name, AssociativeTable.create(name, associativeCollection, keyTable, valueTable));
         });
 
@@ -102,7 +103,7 @@ final class EntityTableLoader {
             }
             else {
                 type = () -> {
-                    TableHandler<Object> tableHandler = databaseController.getHandler(association.name()).getOrElseThrow(() -> {
+                    TableHandler<?> tableHandler = databaseController.getHandler(association.name()).getOrElseThrow(() -> {
                         throw new PandaOrmException("Internal error: Unknown table " + association.name());
                     });
 

@@ -19,6 +19,7 @@ package org.panda_lang.orm.entity;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class EntityModel {
 
@@ -34,6 +35,12 @@ public class EntityModel {
 
     public Optional<Property> getProperty(String name) {
         return Optional.ofNullable(properties.get(name));
+    }
+
+    public Collection<MethodModel> getGetters() {
+        return methods.stream()
+                .filter(model -> model.getType() == MethodType.GET || model.getType() == MethodType.IS || model.getType() == MethodType.HAS)
+                .collect(Collectors.toList());
     }
 
     public Collection<MethodModel> getMethods() {

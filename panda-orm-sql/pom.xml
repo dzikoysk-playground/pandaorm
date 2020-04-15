@@ -35,11 +35,6 @@
             <artifactId>HikariCP</artifactId>
             <version>3.4.2</version>
         </dependency>
-        <dependency>
-            <groupId>ca.krasnay</groupId>
-            <artifactId>sqlbuilder</artifactId>
-            <version>1.2</version>
-        </dependency>
 
         <dependency>
             <groupId>com.h2database</groupId>

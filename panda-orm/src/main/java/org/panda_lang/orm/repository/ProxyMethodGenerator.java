@@ -54,7 +54,7 @@ final class ProxyMethodGenerator {
             throw new PandaOrmException("Unknown collection: " + collection.getName());
         });
 
-        EntityModel entityModel = repositoryModel.getCollectionScheme().getEntityModel();
+        EntityModel entityModel = repositoryModel.getCollectionModel().getEntityModel();
 
         switch (operation) {
             case CREATE:

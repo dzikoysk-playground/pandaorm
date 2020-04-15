@@ -18,16 +18,25 @@ package org.panda_lang.orm.entity;
 
 import org.panda_lang.orm.utils.Annotations;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public final class Property {
 
     private final String name;
     private final Class<?> type;
     private final Annotations annotations;
+    private final Map<MethodType, MethodModel> methods = new HashMap<>();
 
     Property(String name, Class<?> type, Annotations annotations) {
         this.name = name;
         this.type = type;
         this.annotations = annotations;
+    }
+
+    public MethodModel addMethodModel(MethodModel model) {
+        methods.put(model.getType(), model);
+        return model;
     }
 
     public Annotations getAnnotations() {

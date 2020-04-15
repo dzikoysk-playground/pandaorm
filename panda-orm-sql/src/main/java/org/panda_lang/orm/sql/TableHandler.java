@@ -16,47 +16,83 @@
 
 package org.panda_lang.orm.sql;
 
+import org.panda_lang.orm.PandaOrmException;
+import org.panda_lang.orm.entity.MethodModel;
 import org.panda_lang.orm.properties.GenerationStrategy;
 import org.panda_lang.orm.query.DataQuery;
 import org.panda_lang.orm.repository.DataHandler;
+import org.panda_lang.orm.serialization.Type;
+import org.panda_lang.orm.sql.bridge.InsertQuery;
+import org.panda_lang.orm.sql.bridge.SqlUtils;
 import org.panda_lang.orm.sql.containers.AssociativeTable;
+import org.panda_lang.orm.sql.containers.Column;
 import org.panda_lang.orm.sql.containers.Table;
 import org.panda_lang.orm.transaction.DataTransactionResult;
 import org.panda_lang.utilities.commons.ArrayUtils;
 import org.panda_lang.utilities.commons.ClassUtils;
 import org.panda_lang.utilities.commons.ObjectUtils;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.util.UUID;
+
 final class TableHandler<T> implements DataHandler<T> {
 
+    private final DatabaseController controller;
     private final Table table;
 
-    TableHandler(Table table) {
+    TableHandler(DatabaseController controller, Table table) {
+        this.controller = controller;
         this.table = table;
     }
 
     @Override
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     public T create(Object[] constructorArguments) throws Exception {
         T value = (T) table.getCollection().getEntityClass()
                 .getConstructor(ArrayUtils.mergeArrays(ArrayUtils.of(DataHandler.class), ClassUtils.getClasses(constructorArguments)))
                 .newInstance(ArrayUtils.mergeArrays(new Object[] { this }, constructorArguments));
 
-        // TODO: Try to insert object
+        try (Connection connection = controller.createConnection()) {
+            InsertQuery insert = new InsertQuery(table.getName(), table.getColumns().size());
+
+            for (MethodModel getter : table.getCollection().getModel().getEntityModel().getGetters()) {
+                Column<?> column = table.getColumns().get(getter.getProperty().getName());
+                Object fieldValue = getter.getMethod().invoke(value);
+
+                if (fieldValue == null && column.isNotNull()) {
+                    throw new PandaOrmException("Illegal null value");
+                }
+
+                if (fieldValue == null) {
+                    continue; // I think I can just skip nullable values?
+                }
+
+                Type type = column.getType();
+                insert.field(column.getName(), type.getSerializer().serialize(type, fieldValue));
+            }
+
+            PreparedStatement statement = connection.prepareStatement(insert.asString());
+            statement.executeUpdate();
+
+            SqlUtils.consume(connection, "SELECT * FROM users;", result -> System.out.println("Remote user: " + result.getString("name")));
+        }
+
         return value;
     }
 
     @Override
-    public <GENERATED> GENERATED generate(Class<GENERATED> requestedType, GenerationStrategy strategy) throws Exception {
-        return null;
+    public <GENERATED> GENERATED generate(Class<GENERATED> requestedType, GenerationStrategy strategy) {
+        return ObjectUtils.cast(UUID.randomUUID());
     }
 
     @Override
-    public void save(DataTransactionResult<T> transaction) throws Exception {
-
+    public void save(DataTransactionResult<T> transaction) {
+        System.out.println("xd");
     }
 
     @Override
-    public <QUERY> QUERY find(DataQuery<QUERY> query, Object[] queryValues) throws Exception {
+    public <QUERY> QUERY find(DataQuery<QUERY> query, Object[] queryValues) {
         return null;
     }
 

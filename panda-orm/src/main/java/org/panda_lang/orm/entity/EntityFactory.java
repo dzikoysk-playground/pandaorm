@@ -25,7 +25,7 @@ public final class EntityFactory {
     private static final EntityModelLoader ENTITY_SCHEME_LOADER = new EntityModelLoader();
     private static final EntityGenerator ENTITY_GENERATOR = new EntityGenerator();
 
-    public EntityModel createEntityScheme(Class<?> entityClass) {
+    public EntityModel createEntityModel(Class<?> entityClass) {
         return ENTITY_SCHEME_LOADER.load(entityClass);
     }
 

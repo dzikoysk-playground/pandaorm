@@ -57,8 +57,8 @@ final class EntityGenerator {
     private static final CtClass[] TRANSACTION_RUN_TYPES = new CtClass[] { EntityGeneratorConstants.CT_RUNNABLE, EntityGeneratorConstants.CT_ARRAY_LIST };
 
     @SuppressWarnings("unchecked")
-    protected Class<? extends DataEntity> generate(org.panda_lang.orm.repository.RepositoryModel repositoryModel) throws NotFoundException, CannotCompileException {
-        EntityModel entityModel = repositoryModel.getCollectionScheme().getEntityModel();
+    protected Class<? extends DataEntity> generate(RepositoryModel repositoryModel) throws NotFoundException, CannotCompileException {
+        EntityModel entityModel = repositoryModel.getCollectionModel().getEntityModel();
         Class<?> entityInterface = entityModel.getEntityType();
 
         if (!entityInterface.isInterface()) {

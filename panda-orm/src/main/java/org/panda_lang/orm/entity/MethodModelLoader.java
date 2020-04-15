@@ -57,17 +57,12 @@ final class MethodModelLoader {
                 if (!associationValue.isPresent()) {
                     throw new PandaOrmException("Collection based method requires @Association annotation");
                 }
-
-                Property property = new Property(propertyName, propertyType, annotations);
-                properties.put(propertyName, property);
-
-                return new MethodModel(method, operationType, property);
             }
 
             Property property = new Property(propertyName, propertyType, annotations);
             properties.put(propertyName, property);
 
-            return new MethodModel(method, operationType, property);
+            return property.addMethodModel(new MethodModel(method, operationType, property));
         }
 
         Property cachedProperty = properties.get(propertyName);
@@ -77,7 +72,7 @@ final class MethodModelLoader {
             throw new PandaOrmException("Methods associated with the same property cannot have different return type (" + method + " != type " + cachedProperty.getType() + ")");
         }
 
-        return new MethodModel(method, operationType, cachedProperty);
+        return cachedProperty.addMethodModel(new MethodModel(method, operationType, cachedProperty));
     }
 
     private Class<?> getType(MethodType operationType, Method method) {

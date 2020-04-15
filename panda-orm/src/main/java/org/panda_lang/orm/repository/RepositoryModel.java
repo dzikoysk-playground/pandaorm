@@ -39,7 +39,7 @@ public final class RepositoryModel {
         return handler;
     }
 
-    public CollectionModel getCollectionScheme() {
+    public CollectionModel getCollectionModel() {
         return scheme;
     }
 

@@ -18,6 +18,7 @@ package org.panda_lang.orm.memory;
 
 import org.panda_lang.orm.PandaOrmException;
 import org.panda_lang.orm.collection.DataCollection;
+import org.panda_lang.orm.entity.DataEntity;
 import org.panda_lang.orm.entity.Property;
 import org.panda_lang.orm.query.DataQuery;
 import org.panda_lang.orm.query.DataQueryCategoryType;
@@ -43,7 +44,7 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-final class InMemoryDataHandler<T> implements DataHandler<T> {
+final class InMemoryDataHandler<T extends DataEntity> implements DataHandler<T> {
 
     private static final AtomicInteger ID = new AtomicInteger();
 

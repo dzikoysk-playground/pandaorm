@@ -35,7 +35,7 @@ public final class CollectionFactory {
         try {
             Class<? extends DataEntity> entityClass = ENTITY_FACTORY.generateEntityClass(repositoryModel);
 
-            DataCollection collection = createCollection(repositoryModel.getCollectionScheme(), entityClass, repositoryModel.getRepository());
+            DataCollection collection = createCollection(repositoryModel.getCollectionModel(), entityClass, repositoryModel.getRepository());
             REPOSITORY_FACTORY.createRepositoryImplementation(controller, collection, repositoryModel);
 
             return collection;
@@ -44,8 +44,8 @@ public final class CollectionFactory {
         }
     }
 
-    public DataCollection createCollection(CollectionModel scheme, Class<? extends DataEntity> entityClass, Object repository) {
-        return new DataCollectionImpl(scheme.getName(), entityClass , repository);
+    public DataCollection createCollection(CollectionModel model, Class<? extends DataEntity> entityClass, Object repository) {
+        return new DataCollectionImpl(model.getName(), model , repository, entityClass);
     }
 
 }

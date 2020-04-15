@@ -27,7 +27,7 @@ public final class UUIDType {
             UUID.class,
             (type, uuid) -> uuid.toString(),
             (type, value) -> UUID.fromString(value),
-            (stringType, metadata) -> "INT"
+            (stringType, metadata) -> "UUID"
     );
 
     private UUIDType() { }

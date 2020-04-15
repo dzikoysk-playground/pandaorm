@@ -62,7 +62,7 @@ final class PandaOrmInitializer {
 
      */
     protected Collection<? extends DataCollection> initialize(Collection<? extends DataCollectionConfiguration> stereotypes) {
-        Map<String, CollectionModel> collectionModels = initializeSchemes(stereotypes);
+        Map<String, CollectionModel> collectionModels = initializeCollections(stereotypes);
         Collection<RepositoryModel> repositoryModels = initializeRepositories(collectionModels);
 
         injector.getResources()
@@ -79,7 +79,7 @@ final class PandaOrmInitializer {
         return collections.values();
     }
 
-    private Map<String, CollectionModel> initializeSchemes(Collection<? extends DataCollectionConfiguration> stereotypes) {
+    private Map<String, CollectionModel> initializeCollections(Collection<? extends DataCollectionConfiguration> stereotypes) {
         return stereotypes.stream()
                 .map(CollectionModel::of)
                 .collect(Collectors.toMap(CollectionModel::getName, model -> model));
@@ -95,7 +95,7 @@ final class PandaOrmInitializer {
         return (type, berry) -> {
             if (DataRepository.class.isAssignableFrom(type)) {
                 Optional<? extends DataRepository<?>> dataRepository = repositoryModels.stream()
-                        .filter(repositoryScheme -> repositoryScheme.getCollectionScheme().getName().equals(berry.value()))
+                        .filter(repositoryScheme -> repositoryScheme.getCollectionModel().getName().equals(berry.value()))
                         .findFirst()
                         .map(RepositoryModel::getRepository);
 

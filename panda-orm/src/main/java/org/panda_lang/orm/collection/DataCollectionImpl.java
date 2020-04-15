@@ -21,13 +21,15 @@ import org.panda_lang.utilities.commons.ObjectUtils;
 public final class DataCollectionImpl implements DataCollection {
 
     private final String name;
-    private final Class<?> entity;
+    private final CollectionModel model;
     private final Object repository;
+    private final Class<?> entityClass;
 
-    public DataCollectionImpl(String name, Class<?> entity, Object repository) {
+    public DataCollectionImpl(String name, CollectionModel model, Object repository, Class<?> entityClass) {
         this.name = name;
-        this.entity = entity;
+        this.model = model;
         this.repository = repository;
+        this.entityClass = entityClass;
     }
 
     @Override
@@ -36,8 +38,13 @@ public final class DataCollectionImpl implements DataCollection {
     }
 
     @Override
+    public CollectionModel getModel() {
+        return model;
+    }
+
+    @Override
     public Class<?> getEntityClass() {
-        return entity;
+        return entityClass;
     }
 
     @Override

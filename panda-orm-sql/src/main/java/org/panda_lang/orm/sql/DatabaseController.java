@@ -22,6 +22,7 @@ import org.panda_lang.orm.collection.CollectionModel;
 import org.panda_lang.orm.collection.DataCollection;
 import org.panda_lang.orm.repository.DataController;
 import org.panda_lang.orm.serialization.Type;
+import org.panda_lang.orm.sql.bridge.SqlUtils;
 import org.panda_lang.orm.sql.bridge.TableCreator;
 import org.panda_lang.orm.sql.bridge.TableUpdater;
 import org.panda_lang.orm.sql.containers.Table;
@@ -31,8 +32,6 @@ import org.panda_lang.orm.sql.types.UUIDType;
 import org.panda_lang.utilities.commons.ObjectUtils;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
@@ -63,18 +62,12 @@ public final class DatabaseController implements DataController {
         Map<String, Table> remoteTables = remoteTableLoader.loadTables();
 
         System.out.println("Generated handlers for tables: ");
-        entityTables.forEach((name, table) -> tables.put(name, new TableHandler<>(table)));
+        entityTables.forEach((name, table) -> tables.put(name, new TableHandler<>(this, table)));
         tables.values().forEach(System.out::println);
 
         try (Connection connection = dataSource.getConnection()) {
             compare(entityTables, remoteTables, connection);
-
-            PreparedStatement preparedStatement = connection.prepareStatement("SHOW TABLES;");
-            ResultSet result = preparedStatement.executeQuery();
-
-            while (result.next()) {
-                System.out.println("Remote table: " + result.getString("table_name"));
-            }
+            SqlUtils.consume(connection, "SHOW TABLES;", result -> System.out.println("Remote table: " + result.getString("table_name")));
         }
 
         return collections;
@@ -94,6 +87,10 @@ public final class DatabaseController implements DataController {
                 tableCreator.createTable(connection, entityTable);
             }
         }
+    }
+
+    public Connection createConnection() throws SQLException {
+        return dataSource.getConnection();
     }
 
     @Override

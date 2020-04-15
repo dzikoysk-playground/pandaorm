@@ -20,6 +20,8 @@ public interface DataCollection {
 
     <R> R getRepository(Class<R> service);
 
+    CollectionModel getModel();
+
     Class<?> getEntityClass();
 
     String getName();
