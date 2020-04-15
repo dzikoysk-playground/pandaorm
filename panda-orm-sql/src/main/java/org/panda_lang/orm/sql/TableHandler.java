@@ -80,6 +80,10 @@ final class TableHandler<T> implements DataHandler<T> {
         return table.getName();
     }
 
+    public Table getTable() {
+        return table;
+    }
+
     @Override
     public String toString() {
         return (table instanceof AssociativeTable ? "associative " : "") + getIdentifier() + "::" + getDataType().getSimpleName();

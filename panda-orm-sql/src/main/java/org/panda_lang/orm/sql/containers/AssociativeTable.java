@@ -37,13 +37,13 @@ public final class AssociativeTable extends Table {
 
     public static Column<?> toAssociativeColumn(Table table) {
         Column<?> primary = table.getPrimary();
-        return new Column<>(table.getName() + "_" + primary.getName(), primary.getType(), primary.getMetadata(), false, false, false, false, new Pair<>(table, primary));
+        return new Column<>(table.getName() + "_" + primary.getName(), primary::getType, primary.getMetadata(), false, false, false, false, controller -> new Pair<>(table, primary));
     }
 
     public static AssociativeTable create(String name, DataCollection collection, Table a, Table b) {
         HashMap<String, Column<?>> columns = new HashMap<>(3);
 
-        Column<?> idColumn = new Column<>("id", IntType.INT_TYPE, new MetadataImpl(), true, false, true, true, null);
+        Column<?> idColumn = new Column<>("id", () -> IntType.INT_TYPE, new MetadataImpl(), true, false, true, true, null);
         columns.put(idColumn.getName(), idColumn);
 
         Column<?> aColumn = toAssociativeColumn(a);

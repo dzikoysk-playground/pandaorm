@@ -68,6 +68,10 @@ final class DatabaseControllerTest {
         System.out.println("User:" + user.getName());
     }
 
+    @Repository
+    public interface GroupRepository extends SqlRepository<Group> {
+
+    }
 
     @Entity
     public interface Group extends DataEntity {
@@ -85,13 +89,12 @@ final class DatabaseControllerTest {
 
     }
 
-    @Repository
-    public interface GroupRepository extends SqlRepository<Group> {
-
-    }
-
     @Entity
     public interface User extends DataEntity {
+
+        @Association(name = "groups", relation = Relation.DIRECT)
+        Group getGroup();
+        void setGroup(Group group);
 
         void setName(String name);
         String getName();

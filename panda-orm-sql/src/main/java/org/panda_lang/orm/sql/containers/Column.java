@@ -16,37 +16,40 @@
 
 package org.panda_lang.orm.sql.containers;
 
+import io.vavr.Lazy;
 import io.vavr.control.Option;
 import org.jetbrains.annotations.Nullable;
+import org.panda_lang.orm.PandaOrmException;
 import org.panda_lang.orm.serialization.Metadata;
 import org.panda_lang.orm.serialization.Type;
 import org.panda_lang.utilities.commons.ValidationUtils;
-import org.panda_lang.utilities.commons.collection.Pair;
+
+import java.util.function.Supplier;
 
 public final class Column<T> implements Comparable<Column<T>> {
 
     private final String name;
-    private final Type<T> type;
+    private final Lazy<Type<?>> type;
+    private final Option<Reference> reference;
     private final Metadata metadata;
     private final boolean primary;
     private final boolean unique;
     private final boolean notNull;
     private final boolean autoIncrement;
-    private final Option<Pair<Table, Column<?>>> references;
 
-    public Column(String name, Type<T> type, Metadata metadata, boolean primary, boolean unique, boolean notNull, boolean autoIncrement, @Nullable Pair<Table, Column<?>> references) {
+    public Column(String name, Supplier<Type<?>> type, Metadata metadata, boolean primary, boolean unique, boolean notNull, boolean autoIncrement, @Nullable Reference reference) {
         this.name = ValidationUtils.notNull(name, "Undefined name");
-        this.type = ValidationUtils.notNull(type, "Undefined type in column " + name);
         this.metadata = ValidationUtils.notNull(metadata, "Undefined metadata in column " + name);
+        this.type = Lazy.of(ValidationUtils.notNull(type, "Undefined type in column " + name));
         this.primary = primary;
         this.unique = unique;
         this.notNull = notNull;
         this.autoIncrement = autoIncrement;
-        this.references = Option.of(references);
+        this.reference = Option.of(reference);
     }
 
     public Column<T> copy(String customName) {
-        return new Column<>(customName, type, metadata, primary, unique, notNull, autoIncrement, references.get());
+        return new Column<>(customName, type, metadata, primary, unique, notNull, autoIncrement, reference.get());
     }
 
     @Override
@@ -55,15 +58,15 @@ public final class Column<T> implements Comparable<Column<T>> {
             return o.primary ? name.compareTo(o.name) : -1;
         }
 
-        if (references.isDefined()) {
-            return o.references.isDefined() ? name.compareTo(o.name) : 1;
+        if (reference.isDefined()) {
+            return o.reference.isDefined() ? name.compareTo(o.name) : 1;
         }
 
         return name.compareTo(o.name);
     }
 
     public boolean isForeign() {
-        return references.isDefined();
+        return reference.isDefined();
     }
 
     public boolean isNotNull() {
@@ -78,16 +81,18 @@ public final class Column<T> implements Comparable<Column<T>> {
         return primary;
     }
 
-    public Option<Pair<Table, Column<?>>> getReferences() {
-        return references;
+    public Option<Reference> getReference() {
+        return reference;
     }
 
     public Metadata getMetadata() {
         return metadata;
     }
 
-    public Type<T> getType() {
-        return type;
+    public Type<?> getType() {
+        return type.getOrElseThrow(() -> {
+            throw new PandaOrmException("Illegal access to not initialized property");
+        });
     }
 
     public String getName() {
@@ -96,7 +101,7 @@ public final class Column<T> implements Comparable<Column<T>> {
 
     @Override
     public String toString() {
-        return getName() + " " + getType().asString(metadata)
+        return "`" + getName() + "` " + getType().asString(metadata)
                 + (notNull ? " NOT NULL" : "")
                 + (unique ? " UNIQUE" : "")
                 + (primary ? " PRIMARY KEY" : "")

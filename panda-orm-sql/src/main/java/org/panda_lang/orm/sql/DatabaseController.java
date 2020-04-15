@@ -56,11 +56,15 @@ public final class DatabaseController implements DataController {
         types.put(Integer.class, IntType.INT_TYPE);
         types.put(int.class, IntType.INT_TYPE);
 
-        EntityTableLoader entityTableLoader = new EntityTableLoader(types);
+        EntityTableLoader entityTableLoader = new EntityTableLoader(this, types);
         Map<String, Table> entityTables = entityTableLoader.loadModels(models, collections);
 
         RemoteTableLoader remoteTableLoader = new RemoteTableLoader();
         Map<String, Table> remoteTables = remoteTableLoader.loadTables();
+
+        System.out.println("Generated handlers for tables: ");
+        entityTables.forEach((name, table) -> tables.put(name, new TableHandler<>(table)));
+        tables.values().forEach(System.out::println);
 
         try (Connection connection = dataSource.getConnection()) {
             compare(entityTables, remoteTables, connection);
@@ -72,10 +76,6 @@ public final class DatabaseController implements DataController {
                 System.out.println("Remote table: " + result.getString("table_name"));
             }
         }
-
-        System.out.println("Generated handlers for tables: ");
-        entityTables.forEach((name, table) -> tables.put(name, new TableHandler<>(table)));
-        tables.values().forEach(System.out::println);
 
         return collections;
     }
@@ -90,7 +90,7 @@ public final class DatabaseController implements DataController {
                 tableUpdater.update(entityTable, remoteTables.get(name));
             }
             else {
-                TableCreator tableCreator = new TableCreator();
+                TableCreator tableCreator = new TableCreator(this);
                 tableCreator.createTable(connection, entityTable);
             }
         }

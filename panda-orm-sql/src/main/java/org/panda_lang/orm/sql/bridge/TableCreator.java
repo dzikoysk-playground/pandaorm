@@ -16,6 +16,7 @@
 
 package org.panda_lang.orm.sql.bridge;
 
+import org.panda_lang.orm.sql.DatabaseController;
 import org.panda_lang.orm.sql.containers.Column;
 import org.panda_lang.orm.sql.containers.Table;
 import org.panda_lang.utilities.commons.collection.Pair;
@@ -30,7 +31,13 @@ import java.util.stream.Collectors;
 
 public final class TableCreator {
 
-    private static final String STATEMENT = "CREATE TABLE ${name} ( ${fields} );";
+    private static final String STATEMENT = "CREATE TABLE `${name}` ( ${fields} );";
+
+    private final DatabaseController databaseController;
+
+    public TableCreator(DatabaseController databaseController) {
+        this.databaseController = databaseController;
+    }
 
     public void createTable(Connection connection, Table entityTable) throws SQLException {
         List<String> fields = entityTable.getColumns().values().stream()
@@ -41,8 +48,8 @@ public final class TableCreator {
         entityTable.getColumns().values().stream()
                 .filter(Column::isForeign)
                 .forEach(column -> {
-                    Pair<Table, Column<?>> reference = column.getReferences().get();
-                    fields.add("FOREIGN KEY (" + column.getName() + ") REFERENCES " + reference.getKey().getName() + "(" + reference.getValue().getName() + ")");
+                    Pair<Table, Column<?>> reference = column.getReference().get().apply(databaseController);
+                    fields.add("FOREIGN KEY (`" + column.getName() + "`) REFERENCES `" + reference.getKey().getName() + "`(`" + reference.getValue().getName() + "`)");
                 });
 
         MessageFormatter formatter = new MessageFormatter()
