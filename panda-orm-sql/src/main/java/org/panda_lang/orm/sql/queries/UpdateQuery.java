@@ -32,7 +32,7 @@ public final class UpdateQuery extends FieldQuery<UpdateQuery> {
     public PreparedStatement toPreparedStatement(Connection connection, EntityModel model, Object entity) throws Exception {
         PreparedStatement preparedStatement = connection.prepareStatement(
                 "UPDATE " + SqlUtils.toIdentifier(super.table.getName()) +" " +
-                "SET " + SqlUtils.toIdentifierList(super.fields, pair -> SqlUtils.toIdentifier(pair.getKey()) + " = ?") + " " +
+                "SET " + SqlUtils.toCustomList(super.fields, pair -> SqlUtils.toIdentifier(pair.getKey()) + " = ?") + " " +
                 "WHERE " + SqlUtils.toIdentifier(table.getPrimary().getName()) + " = ?"
         );
 

@@ -71,7 +71,11 @@ public final class SqlUtils {
     }
 
     public static <T> String toIdentifierList(Collection<T> elements, Function<T, String> function) {
-        return ContentJoiner.on(", ").join(elements, function).toString();
+        return ContentJoiner.on(", ").join(elements, value -> toIdentifier(function.apply(value))).toString();
+    }
+
+    public static <T> String toCustomList(Collection<T> elements, Function<T, String> function) {
+        return ContentJoiner.on(", ").join(elements, function::apply).toString();
     }
 
     public static String toValueList(Collection<?> elements) {

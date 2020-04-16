@@ -64,17 +64,26 @@ final class DatabaseControllerTest {
         DataCollection users = orm.getCollection("users");
         UserRepository userRepository = users.getRepository(UserRepository.class);
 
-        User user = userRepository.createUser("SQLUser");
-        System.out.println("User:" + user.getName());
+        User user = userRepository.createUser("insertt");
+        System.out.println("User: " + user.getName());
 
-        user.setName("SQLUserUpdated");
-        System.out.println("Updated User:" + user.getName());
+        user.setName("makub");
+        System.out.println("Updated user: " + user.getName());
+
+        DataCollection groups = orm.getCollection("groups");
+        GroupRepository groupRepository = groups.getRepository(GroupRepository.class);
+
+        Group group = groupRepository.createGroup("natural born pranksters");
+        System.out.println("Group: " + group.getName());
+        System.out.println(group.getMembers());
 
 
     }
 
     @Repository
     public interface GroupRepository extends SqlRepository<Group> {
+
+        Group createGroup(@As("name") String name);
 
     }
 

@@ -49,7 +49,7 @@ final class TableHandler<T> implements DataHandler<T> {
     }
 
     @Override
-    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @SuppressWarnings({ "unchecked" })
     public T create(Object[] constructorArguments) throws Exception {
         T value = (T) table.getCollection().getEntityClass()
                 .getConstructor(ArrayUtils.mergeArrays(ArrayUtils.of(DataHandler.class), ClassUtils.getClasses(constructorArguments)))
@@ -60,6 +60,11 @@ final class TableHandler<T> implements DataHandler<T> {
 
             for (MethodModel getter : getEntityModel().getGetters()) {
                 Column<?> column = table.getColumns().get(getter.getProperty().getName());
+
+                if (column == null) { // assoc
+                    continue;
+                }
+
                 String fieldValue = column.serialize(getter.getMethod().invoke(value));
 
                 if (fieldValue != null) {
