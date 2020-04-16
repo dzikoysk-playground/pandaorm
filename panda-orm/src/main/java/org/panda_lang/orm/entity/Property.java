@@ -16,6 +16,7 @@
 
 package org.panda_lang.orm.entity;
 
+import io.vavr.control.Option;
 import org.panda_lang.orm.utils.Annotations;
 
 import java.util.HashMap;
@@ -37,6 +38,10 @@ public final class Property {
     public MethodModel addMethodModel(MethodModel model) {
         methods.put(model.getType(), model);
         return model;
+    }
+
+    public Option<MethodModel> getMethodModel(MethodType type) {
+        return Option.of(methods.get(type));
     }
 
     public Annotations getAnnotations() {

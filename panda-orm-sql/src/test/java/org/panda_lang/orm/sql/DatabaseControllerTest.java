@@ -66,6 +66,11 @@ final class DatabaseControllerTest {
 
         User user = userRepository.createUser("SQLUser");
         System.out.println("User:" + user.getName());
+
+        user.setName("SQLUserUpdated");
+        System.out.println("Updated User:" + user.getName());
+
+
     }
 
     @Repository

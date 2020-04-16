@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.panda_lang.orm.sql.bridge;
+package org.panda_lang.orm.sql.queries;
 
 import org.panda_lang.orm.sql.DatabaseController;
 import org.panda_lang.orm.sql.containers.Column;

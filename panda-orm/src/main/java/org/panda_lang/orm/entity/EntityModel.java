@@ -16,6 +16,8 @@
 
 package org.panda_lang.orm.entity;
 
+import org.panda_lang.orm.PandaOrmException;
+
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
@@ -31,6 +33,18 @@ public class EntityModel {
         this.entityType = entityType;
         this.properties = properties;
         this.methods = methods;
+    }
+
+    public Object getPropertyValue(Object entity, String name) throws Exception {
+        // todo: generate cached suppliers for these values in the future
+
+        Property property = getProperties().get(name);
+
+        MethodModel methodModel = property.getMethodModel(MethodType.GET).getOrElseThrow(() -> {
+            throw new PandaOrmException("Internal error: missing getter for property " + property);
+        });
+
+        return methodModel.getMethod().invoke(entity);
     }
 
     public Optional<Property> getProperty(String name) {

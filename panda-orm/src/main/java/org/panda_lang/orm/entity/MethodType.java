@@ -18,21 +18,30 @@ package org.panda_lang.orm.entity;
 
 public enum MethodType {
 
-    GET,
-    SET,
+    SET(MethodGroup.SETTERS),
 
-    ADD,
-    REMOVE,
+    GET(MethodGroup.GETTERS),
+    IS(MethodGroup.GETTERS),
+    HAS(MethodGroup.GETTERS),
 
-    IS,
-    HAS,
-    CONTAINS,
+    ADD(MethodGroup.UPDATERS),
+    REMOVE(MethodGroup.UPDATERS),
+    UPDATE(MethodGroup.UPDATERS),
+    CREATE(MethodGroup.UPDATERS),
+    DELETE(MethodGroup.UPDATERS),
 
-    CREATE,
-    DELETE,
+    FIND(MethodGroup.UTILITY),
+    CONTAINS(MethodGroup.UTILITY);
 
-    UPDATE,
-    FIND;
+    private final MethodGroup group;
+
+    MethodType(MethodGroup group) {
+        this.group = group;
+    }
+
+    public MethodGroup getGroup() {
+        return group;
+    }
 
     public static MethodType of(String name) {
         for (MethodType value : values()) {

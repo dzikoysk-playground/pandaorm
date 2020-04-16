@@ -14,21 +14,13 @@
  * limitations under the License.
  */
 
-package org.panda_lang.orm.sql.bridge;
+package org.panda_lang.orm.entity;
 
-import com.zaxxer.hikari.HikariDataSource;
-import org.panda_lang.orm.sql.containers.Table;
+public enum MethodGroup {
 
-public final class TableUpdater {
-
-    private final HikariDataSource dataSource;
-
-    public TableUpdater(HikariDataSource dataSource) {
-        this.dataSource = dataSource;
-    }
-
-    public void update(Table entityTable, Table remoteTable) {
-
-    }
+    GETTERS,
+    SETTERS,
+    UPDATERS,
+    UTILITY
 
 }

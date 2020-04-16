@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package org.panda_lang.orm.sql.bridge;
+package org.panda_lang.orm.sql.queries;
 
+import org.panda_lang.utilities.commons.StringUtils;
 import org.panda_lang.utilities.commons.function.ThrowingConsumer;
 import org.panda_lang.utilities.commons.text.ContentJoiner;
 
@@ -24,6 +25,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.function.Function;
 
 public final class SqlUtils {
 
@@ -42,6 +44,16 @@ public final class SqlUtils {
         }
     }
 
+    public static String generateValues(int amount) {
+        String content = StringUtils.repeated(amount, "?, ");
+
+        if (!content.isEmpty()) {
+            content = content.substring(0, content.length() - 2);
+        }
+
+        return content;
+    }
+
     public static String toIdentifier(Object value) {
         return value == null ? NULL : IDENTIFIER + value + IDENTIFIER;
     }
@@ -55,7 +67,11 @@ public final class SqlUtils {
     }
 
     public static String toIdentifierList(Collection<?> elements) {
-        return ContentJoiner.on(", ").join(elements, SqlUtils::toIdentifier).toString();
+        return toIdentifierList(elements, SqlUtils::toIdentifier);
+    }
+
+    public static <T> String toIdentifierList(Collection<T> elements, Function<T, String> function) {
+        return ContentJoiner.on(", ").join(elements, function).toString();
     }
 
     public static String toValueList(Collection<?> elements) {

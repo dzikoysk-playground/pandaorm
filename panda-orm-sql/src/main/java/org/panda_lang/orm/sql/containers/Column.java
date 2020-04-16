@@ -48,6 +48,20 @@ public final class Column<T> implements Comparable<Column<T>> {
         this.reference = Option.of(reference);
     }
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    public String serialize(Object value) {
+        if (value == null && isNotNull()) {
+            throw new PandaOrmException("Illegal null value");
+        }
+
+        if (value == null) {
+            return null;
+        }
+
+        Type type = getType();
+        return type.getSerializer().serialize(type, value);
+    }
+
     public Column<T> copy(String customName) {
         return new Column<>(customName, type, metadata, primary, unique, notNull, autoIncrement, reference.get());
     }

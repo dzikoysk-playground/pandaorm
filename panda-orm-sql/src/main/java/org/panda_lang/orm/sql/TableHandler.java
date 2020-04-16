@@ -16,17 +16,18 @@
 
 package org.panda_lang.orm.sql;
 
-import org.panda_lang.orm.PandaOrmException;
+import org.panda_lang.orm.entity.EntityModel;
 import org.panda_lang.orm.entity.MethodModel;
 import org.panda_lang.orm.properties.GenerationStrategy;
 import org.panda_lang.orm.query.DataQuery;
 import org.panda_lang.orm.repository.DataHandler;
-import org.panda_lang.orm.serialization.Type;
-import org.panda_lang.orm.sql.bridge.InsertQuery;
-import org.panda_lang.orm.sql.bridge.SqlUtils;
 import org.panda_lang.orm.sql.containers.AssociativeTable;
 import org.panda_lang.orm.sql.containers.Column;
 import org.panda_lang.orm.sql.containers.Table;
+import org.panda_lang.orm.sql.queries.InsertQuery;
+import org.panda_lang.orm.sql.queries.SqlUtils;
+import org.panda_lang.orm.sql.queries.UpdateQuery;
+import org.panda_lang.orm.transaction.DataModification;
 import org.panda_lang.orm.transaction.DataTransactionResult;
 import org.panda_lang.utilities.commons.ArrayUtils;
 import org.panda_lang.utilities.commons.ClassUtils;
@@ -34,6 +35,7 @@ import org.panda_lang.utilities.commons.ObjectUtils;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.util.List;
 import java.util.UUID;
 
 final class TableHandler<T> implements DataHandler<T> {
@@ -54,25 +56,19 @@ final class TableHandler<T> implements DataHandler<T> {
                 .newInstance(ArrayUtils.mergeArrays(new Object[] { this }, constructorArguments));
 
         try (Connection connection = controller.createConnection()) {
-            InsertQuery insert = new InsertQuery(table.getName(), table.getColumns().size());
+            InsertQuery insert = new InsertQuery(table, table.getColumns().size());
 
-            for (MethodModel getter : table.getCollection().getModel().getEntityModel().getGetters()) {
+            for (MethodModel getter : getEntityModel().getGetters()) {
                 Column<?> column = table.getColumns().get(getter.getProperty().getName());
-                Object fieldValue = getter.getMethod().invoke(value);
+                String fieldValue = column.serialize(getter.getMethod().invoke(value));
 
-                if (fieldValue == null && column.isNotNull()) {
-                    throw new PandaOrmException("Illegal null value");
+                if (fieldValue != null) {
+                    insert.field(column.getName(), fieldValue);
                 }
-
-                if (fieldValue == null) {
-                    continue; // I think I can just skip nullable values?
-                }
-
-                Type type = column.getType();
-                insert.field(column.getName(), type.getSerializer().serialize(type, fieldValue));
             }
 
-            PreparedStatement statement = connection.prepareStatement(insert.asString());
+            PreparedStatement statement = insert.toPreparedStatement(connection);
+            System.out.println(statement.toString());
             statement.executeUpdate();
 
             SqlUtils.consume(connection, "SELECT * FROM users;", result -> System.out.println("Remote user: " + result.getString("name")));
@@ -87,8 +83,28 @@ final class TableHandler<T> implements DataHandler<T> {
     }
 
     @Override
-    public void save(DataTransactionResult<T> transaction) {
-        System.out.println("xd");
+    public void save(DataTransactionResult<T> transaction) throws Exception {
+        List<? extends DataModification> modifications = transaction.getModifications();
+
+        try (Connection connection = controller.createConnection()) {
+            UpdateQuery update = new UpdateQuery(table, modifications.size());
+
+            for (DataModification modification : modifications) {
+                Column<?> column = table.getColumns().get(modification.getProperty());
+                String fieldValue = column.serialize(getEntityModel().getPropertyValue(transaction.getEntity(), modification.getProperty()));
+
+                if (fieldValue != null) {
+                    update.field(modification.getProperty(), fieldValue);
+                }
+            }
+
+            PreparedStatement preparedStatement = update.toPreparedStatement(connection, getEntityModel(), transaction.getEntity());
+            System.out.println(preparedStatement);
+            preparedStatement.executeUpdate();
+
+            SqlUtils.consume(connection, "SELECT * FROM users;", result -> System.out.println("Remote user: " + result.getString("name")));
+            transaction.getSuccessAction().ifPresent(action -> action.accept(0, 0));
+        }
     }
 
     @Override
@@ -104,6 +120,10 @@ final class TableHandler<T> implements DataHandler<T> {
     @Override
     public void handleException(Exception e) {
 
+    }
+
+    private EntityModel getEntityModel() {
+        return table.getCollection().getModel().getEntityModel();
     }
 
     @Override
