@@ -21,19 +21,20 @@ import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtConstructor;
 import javassist.CtField;
+import javassist.CtField.Initializer;
 import javassist.CtMethod;
 import javassist.Modifier;
 import javassist.NotFoundException;
 import org.panda_lang.orm.PandaOrmException;
+import org.panda_lang.orm.properties.As;
+import org.panda_lang.orm.properties.Generated;
+import org.panda_lang.orm.properties.GenerationStrategy;
 import org.panda_lang.orm.repository.RepositoryMethod;
 import org.panda_lang.orm.repository.RepositoryModel;
 import org.panda_lang.orm.repository.RepositoryOperation;
 import org.panda_lang.orm.transaction.DefaultTransaction;
 import org.panda_lang.orm.transaction.Transaction;
 import org.panda_lang.orm.transaction.TransactionModification;
-import org.panda_lang.orm.properties.As;
-import org.panda_lang.orm.properties.Generated;
-import org.panda_lang.orm.properties.GenerationStrategy;
 import org.panda_lang.orm.utils.FunctionUtils;
 import org.panda_lang.utilities.commons.ArrayUtils;
 import org.panda_lang.utilities.commons.ClassPoolUtils;
@@ -42,22 +43,47 @@ import org.panda_lang.utilities.commons.collection.Maps;
 import org.panda_lang.utilities.commons.javassist.CtCode;
 import org.panda_lang.utilities.commons.javassist.implementer.FunctionalInterfaceImplementer;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 final class EntityGenerator {
 
     private static final FunctionalInterfaceImplementer IMPLEMENTER = new FunctionalInterfaceImplementer();
 
-    private static final CtClass[] TRANSACTION_RUN_TYPES = new CtClass[] { EntityGeneratorConstants.CT_RUNNABLE, EntityGeneratorConstants.CT_ARRAY_LIST };
+    private static final CtClass[] TRANSACTION_RUN_TYPES = {
+            EntityGeneratorConstants.CT_RUNNABLE,
+            EntityGeneratorConstants.CT_ARRAY_LIST
+    };
+
+    /*
+    class Controlled<Entity> {
+        static Map<String, EntityField> _FIELDS
+        DataHandler _dataHandler
+        AtomicBoolean _lock
+        ArrayList _modifications
+
+        {{ properties fields }}
+
+        {{ constructors (dataHandler, {{ create params }}) }}
+
+        {{ methods }}
+
+        impls transaction() & transactionRun()
+    }
+     */
 
     @SuppressWarnings("unchecked")
-    protected Class<? extends DataEntity> generate(RepositoryModel repositoryModel) throws NotFoundException, CannotCompileException {
+    protected Class<? extends DataEntity> generate(RepositoryModel repositoryModel) throws NotFoundException, CannotCompileException, IOException, ReflectiveOperationException {
         EntityModel entityModel = repositoryModel.getCollectionModel().getEntityModel();
         Class<?> entityInterface = entityModel.getEntityType();
 
@@ -77,16 +103,25 @@ final class EntityGenerator {
         entityClass.setModifiers(Modifier.PUBLIC);
 
         generateDefaultFields(entityClass);
-        generateFields(entityModel, entityClass);
+        generatePropertiesFields(entityModel, entityClass);
         generateDefaultConstructor(entityModel, entityClass);
         generateConstructors(repositoryModel, entityClass);
         generateMethods(entityModel, entityClass);
         generateTransactions(entityClass);
+        generateImplementations(entityClass);
 
-        return (Class<? extends DataEntity>) entityClass.toClass();
+        entityClass.writeFile("./generated-entities/");
+        Class<? extends DataEntity> generatedClass = (Class<? extends DataEntity>) entityClass.toClass();
+        generateEntityFields(entityModel, generatedClass);
+
+        return generatedClass;
     }
 
     private void generateDefaultFields(CtClass entityClass) throws CannotCompileException {
+        CtField fields = new CtField(EntityGeneratorConstants.CT_HASHMAP, "_FIELDS", entityClass);
+        fields.setModifiers(Modifier.STATIC | Modifier.PUBLIC);
+        entityClass.addField(fields, Initializer.byExpr("new " + HashMap.class.getName() + "();"));
+
         CtField dataHandler = new CtField(EntityGeneratorConstants.CT_DATA_HANDLER, "_dataHandler", entityClass);
         entityClass.addField(dataHandler);
 
@@ -97,12 +132,36 @@ final class EntityGenerator {
         entityClass.addField(modifications);
     }
 
+    private void generatePropertiesFields(EntityModel model, CtClass entityClass) throws CannotCompileException, NotFoundException {
+        for (Property property : model.getProperties().values()) {
+            CtField field = new CtField(ClassPoolUtils.get(property.getType()), property.getName(), entityClass);
+            field.setModifiers(Modifier.PUBLIC);
+            entityClass.addField(field);
+        }
+    }
+
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    private void generateEntityFields(EntityModel model, Class<? extends DataEntity> generatedClass) throws CannotCompileException, NotFoundException, ReflectiveOperationException {
+        LinkedHashMap<String, CtClass> parameters = new LinkedHashMap<>(0);
+        Map<String, PropertyField> entityFields = (Map<String, PropertyField>) generatedClass.getField("_FIELDS").get(null);
+
+        for (Property property : model.getProperties().values()) {
+            String name = property.getName();
+            String field = "((" + generatedClass.getName() + ") $1)." + name;
+
+            Class<?> getter = IMPLEMENTER.generate(generatedClass.getName() + name + "Getter", Function.class, parameters, "return " + field + ";");
+            Class<?> setter = IMPLEMENTER.generate(generatedClass.getName() + name + "Setter", BiConsumer.class, parameters, field + " = (" + property.getType().getName() + ") $2;");
+
+            entityFields.put(name, new PropertyField(property, (Function) getter.newInstance(), (BiConsumer) setter.newInstance()));
+        }
+    }
+
     private void generateDefaultConstructor(EntityModel scheme, CtClass entityClass) throws CannotCompileException {
         CtConstructor constructor = new CtConstructor(new CtClass[]{ EntityGeneratorConstants.CT_DATA_HANDLER }, entityClass);
 
         StringBuilder bodyBuilder = new StringBuilder("{");
-        bodyBuilder.append("this._lock = new ").append(AtomicBoolean.class.getName()).append("(false);");
         bodyBuilder.append("this._dataHandler = $1;");
+        bodyBuilder.append("this._lock = new ").append(AtomicBoolean.class.getName()).append("(false);");
 
         scheme.getProperties().values().stream()
                 .map(property -> Maps.immutableEntryOf(property, property.getAnnotations().getAnnotation(Generated.class)))
@@ -119,14 +178,6 @@ final class EntityGenerator {
 
         constructor.setBody(bodyBuilder.append("}").toString());
         entityClass.addConstructor(constructor);
-    }
-
-    private void generateFields(EntityModel scheme, CtClass entityClass) throws CannotCompileException, NotFoundException {
-        for (Property property : scheme.getProperties().values()) {
-            CtField field = new CtField(ClassPoolUtils.get(property.getType()), property.getName(), entityClass);
-            field.setModifiers(Modifier.PUBLIC);
-            entityClass.addField(field);
-        }
     }
 
     private void generateConstructors(RepositoryModel repositoryModel, CtClass entityClass) throws CannotCompileException, NotFoundException {
@@ -228,6 +279,14 @@ final class EntityGenerator {
                         "return new {Transaction}(this._dataHandler, this, new {Runnable}(this, $1, list), {FunctionUtils}.toSupplier(list));"
                 );
         entityClass.addMethod(transactionMethod);
+    }
+
+    private void generateImplementations(CtClass entityClass) throws CannotCompileException {
+        entityClass.addMethod(CtCode.of(new CtMethod(EntityGeneratorConstants.CT_PROPERTY_FIELD, "getPropertyField", new CtClass[] { EntityGeneratorConstants.CT_STRING }, entityClass))
+                .compile("return ($r) _FIELDS.get($1);"));
+
+        entityClass.addMethod(CtCode.of(new CtMethod(EntityGeneratorConstants.CT_COLLECTION, "getPropertyFields", new CtClass[0], entityClass))
+                .compile("return ($r) _FIELDS.values();"));
     }
 
 }

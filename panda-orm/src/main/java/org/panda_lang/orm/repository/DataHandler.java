@@ -16,11 +16,12 @@
 
 package org.panda_lang.orm.repository;
 
+import org.panda_lang.orm.entity.DataEntity;
+import org.panda_lang.orm.properties.GenerationStrategy;
 import org.panda_lang.orm.query.DataQuery;
 import org.panda_lang.orm.transaction.DataTransactionResult;
-import org.panda_lang.orm.properties.GenerationStrategy;
 
-public interface DataHandler<ENTITY> {
+public interface DataHandler<ENTITY extends DataEntity<ENTITY>> {
 
     ENTITY create(Object[] constructorArguments) throws Exception;
 

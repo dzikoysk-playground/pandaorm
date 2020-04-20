@@ -36,7 +36,7 @@
         <dependency>
             <groupId>org.panda-lang</groupId>
             <artifactId>panda-utilities</artifactId>
-            <version>indev-20.3.14</version>
+            <version>indev-20.4.20</version>
         </dependency>
 
         <!-- Tests -->

@@ -17,15 +17,16 @@
 package org.panda_lang.orm.transaction;
 
 import org.jetbrains.annotations.Nullable;
+import org.panda_lang.orm.entity.DataEntity;
 import org.panda_lang.orm.repository.DataHandler;
 import org.panda_lang.orm.PandaOrmException;
 
 import java.util.List;
 import java.util.function.Supplier;
 
-public class Transaction<T> implements DataTransaction {
+public class Transaction<T extends DataEntity<T>> implements DataTransaction {
 
-    private final org.panda_lang.orm.repository.DataHandler<T> handler;
+    private final DataHandler<T> handler;
 
     protected final T entity;
     protected final Runnable transactionContent;

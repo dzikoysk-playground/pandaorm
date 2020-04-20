@@ -17,8 +17,10 @@
 package org.panda_lang.orm.entity;
 
 import io.vavr.control.Option;
+import org.panda_lang.orm.properties.Association;
 import org.panda_lang.orm.utils.Annotations;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,16 +30,28 @@ public final class Property {
     private final Class<?> type;
     private final Annotations annotations;
     private final Map<MethodType, MethodModel> methods = new HashMap<>();
+    private final boolean foreign;
+    private final boolean collection;
 
     Property(String name, Class<?> type, Annotations annotations) {
         this.name = name;
         this.type = type;
         this.annotations = annotations;
+        this.foreign = annotations.getAnnotation(Association.class).isPresent();
+        this.collection = Collection.class.isAssignableFrom(type);
     }
 
     public MethodModel addMethodModel(MethodModel model) {
         methods.put(model.getType(), model);
         return model;
+    }
+
+    public boolean isCollection() {
+        return collection;
+    }
+
+    public boolean isForeign() {
+        return foreign;
     }
 
     public Option<MethodModel> getMethodModel(MethodType type) {
@@ -54,6 +68,11 @@ public final class Property {
 
     public String getName() {
         return name;
+    }
+
+    @Override
+    public String toString() {
+        return "Property{ name='" + name + ", type=" + type + " }";
     }
 
 }

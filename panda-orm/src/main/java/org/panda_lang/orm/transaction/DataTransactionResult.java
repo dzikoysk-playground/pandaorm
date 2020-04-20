@@ -16,14 +16,16 @@
 
 package org.panda_lang.orm.transaction;
 
+import org.panda_lang.orm.entity.DataEntity;
+
 import java.util.List;
 import java.util.Optional;
 
-public interface DataTransactionResult<T> {
+public interface DataTransactionResult<T extends DataEntity<T>> {
 
     Optional<DataTransactionCondition> getRetryAction();
 
-    Optional<org.panda_lang.orm.transaction.DataTransactionAction> getSuccessAction();
+    Optional<DataTransactionAction> getSuccessAction();
 
     Optional<DataTransactionAction> getElseAction();
 

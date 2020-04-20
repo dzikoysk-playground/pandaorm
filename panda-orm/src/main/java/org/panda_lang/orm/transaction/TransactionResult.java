@@ -16,10 +16,12 @@
 
 package org.panda_lang.orm.transaction;
 
+import org.panda_lang.orm.entity.DataEntity;
+
 import java.util.List;
 import java.util.Optional;
 
-final class TransactionResult<T> implements DataTransactionResult<T> {
+final class TransactionResult<T extends DataEntity<T>> implements DataTransactionResult<T> {
 
     private final Transaction<T> transaction;
 

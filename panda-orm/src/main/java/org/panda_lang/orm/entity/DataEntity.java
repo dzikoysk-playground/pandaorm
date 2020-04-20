@@ -18,8 +18,14 @@ package org.panda_lang.orm.entity;
 
 import org.panda_lang.orm.transaction.DataTransaction;
 
-public interface DataEntity {
+import java.util.Collection;
+
+public interface DataEntity<E extends DataEntity<?>> {
 
     DataTransaction transaction(Runnable transaction);
+
+    <T> PropertyField<E, T> getPropertyField(String propertyName);
+
+    <T> Collection<? extends PropertyField<E, T>> getPropertyFields();
 
 }

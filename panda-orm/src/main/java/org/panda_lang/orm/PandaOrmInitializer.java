@@ -26,6 +26,7 @@ import org.panda_lang.orm.collection.DataCollectionConfiguration;
 import org.panda_lang.orm.properties.Berry;
 import org.panda_lang.utilities.inject.Injector;
 
+import java.lang.reflect.Parameter;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
@@ -91,8 +92,10 @@ final class PandaOrmInitializer {
                 .collect(Collectors.toList());
     }
 
-    private BiFunction<Class<?>, Berry, ?> initializeBerry(Collection<RepositoryModel> repositoryModels) {
-        return (type, berry) -> {
+    private BiFunction<Parameter, Berry, ?> initializeBerry(Collection<RepositoryModel> repositoryModels) {
+        return (parameter, berry) -> {
+            Class<?> type = parameter.getType();
+
             if (DataRepository.class.isAssignableFrom(type)) {
                 Optional<? extends DataRepository<?>> dataRepository = repositoryModels.stream()
                         .filter(repositoryScheme -> repositoryScheme.getCollectionModel().getName().equals(berry.value()))

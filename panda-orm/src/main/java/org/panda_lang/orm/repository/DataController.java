@@ -19,6 +19,7 @@ package org.panda_lang.orm.repository;
 import io.vavr.control.Option;
 import org.panda_lang.orm.collection.CollectionModel;
 import org.panda_lang.orm.collection.DataCollection;
+import org.panda_lang.orm.entity.DataEntity;
 
 import java.util.Map;
 
@@ -26,7 +27,7 @@ public interface DataController {
 
     Map<String, ? extends DataCollection> initialize(Map<String, ? extends CollectionModel> models, Map<String, ? extends DataCollection> collections) throws Exception;
 
-    <ENTITY> Option<? extends DataHandler<ENTITY>> getHandler(String collection);
+    <ENTITY extends DataEntity<ENTITY>> Option<? extends DataHandler<ENTITY>> getHandler(String collection);
 
     String getIdentifier();
 

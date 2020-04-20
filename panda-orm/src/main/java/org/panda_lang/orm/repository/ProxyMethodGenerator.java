@@ -18,13 +18,14 @@ package org.panda_lang.orm.repository;
 
 import org.panda_lang.orm.PandaOrmException;
 import org.panda_lang.orm.collection.DataCollection;
+import org.panda_lang.orm.entity.DataEntity;
 import org.panda_lang.orm.entity.EntityModel;
 import org.panda_lang.orm.query.DataQuery;
 import org.panda_lang.orm.query.DataQueryFactory;
 import org.panda_lang.utilities.commons.ArrayUtils;
 import org.panda_lang.utilities.commons.CamelCaseUtils;
 import org.panda_lang.utilities.commons.ObjectUtils;
-import org.panda_lang.utilities.commons.function.CachedSupplier;
+import org.panda_lang.utilities.commons.function.Lazy;
 
 import java.lang.reflect.Method;
 import java.util.List;
@@ -46,7 +47,7 @@ final class ProxyMethodGenerator {
     }
 
     private Supplier<ProxyFunction> generateSupplier(DataController controller, DataCollection collection, RepositoryModel repositoryModel, Method method, RepositoryOperation operation) {
-        return new CachedSupplier<>(() -> generate(controller, collection, repositoryModel, method, operation));
+        return new Lazy<>(() -> generate(controller, collection, repositoryModel, method, operation));
     }
 
     private ProxyFunction generate(DataController controller, DataCollection collection, RepositoryModel repositoryModel, Method method, RepositoryOperation operation) {
@@ -72,9 +73,10 @@ final class ProxyMethodGenerator {
         return handler::create;
     }
 
-    private ProxyFunction deleteFunction(DataHandler<Object> handler) {
+    @SuppressWarnings("unchecked")
+    private <E extends DataEntity<E>> ProxyFunction deleteFunction(DataHandler<E> handler) {
         return parameters -> {
-            ArrayUtils.forEachThrowing(parameters, handler::delete);
+            ArrayUtils.forEachThrowing(parameters, parameter -> handler.delete((E) parameter));
             return null;
         };
     }

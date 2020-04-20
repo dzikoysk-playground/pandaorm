@@ -31,6 +31,7 @@ import org.panda_lang.orm.properties.Id;
 import org.panda_lang.orm.properties.Repository;
 import org.panda_lang.utilities.commons.UnsafeUtils;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
@@ -77,7 +78,9 @@ final class DatabaseControllerTest {
         System.out.println("Group: " + group.getName());
         System.out.println(group.getMembers());
 
-
+        group.getPropertyField("members").set(group, new ArrayList<>());
+        System.out.println(group.getPropertyField("members"));
+        System.out.println(group.getMembers());
     }
 
     @Repository
@@ -88,7 +91,7 @@ final class DatabaseControllerTest {
     }
 
     @Entity
-    public interface Group extends DataEntity {
+    public interface Group extends DataEntity<Group> {
 
         @Association(name = "users", relation = Relation.MANY)
         Collection<User> getMembers();
@@ -104,7 +107,7 @@ final class DatabaseControllerTest {
     }
 
     @Entity
-    public interface User extends DataEntity {
+    public interface User extends DataEntity<User> {
 
         @Association(name = "groups", relation = Relation.DIRECT)
         Group getGroup();

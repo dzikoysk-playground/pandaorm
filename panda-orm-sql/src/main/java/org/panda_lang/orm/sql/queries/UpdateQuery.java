@@ -16,7 +16,7 @@
 
 package org.panda_lang.orm.sql.queries;
 
-import org.panda_lang.orm.entity.EntityModel;
+import org.panda_lang.orm.entity.DataEntity;
 import org.panda_lang.orm.sql.containers.Column;
 import org.panda_lang.orm.sql.containers.Table;
 
@@ -29,7 +29,7 @@ public final class UpdateQuery extends FieldQuery<UpdateQuery> {
         super(table, maxCapacity);
     }
 
-    public PreparedStatement toPreparedStatement(Connection connection, EntityModel model, Object entity) throws Exception {
+    public <E extends DataEntity<E>> PreparedStatement toPreparedStatement(Connection connection, E entity) throws Exception {
         PreparedStatement preparedStatement = connection.prepareStatement(
                 "UPDATE " + SqlUtils.toIdentifier(super.table.getName()) +" " +
                 "SET " + SqlUtils.toCustomList(super.fields, pair -> SqlUtils.toIdentifier(pair.getKey()) + " = ?") + " " +
@@ -41,7 +41,7 @@ public final class UpdateQuery extends FieldQuery<UpdateQuery> {
         }
 
         Column<?> primary = table.getPrimary();
-        String primaryValue = primary.serialize(model.getPropertyValue(entity, primary.getName()));
+        String primaryValue = primary.serialize(entity.getPropertyField(primary.getName()).get(entity));
         preparedStatement.setString(super.fields.size() + 1, primaryValue);
 
         return preparedStatement;

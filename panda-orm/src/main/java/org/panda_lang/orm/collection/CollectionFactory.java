@@ -26,6 +26,8 @@ import org.panda_lang.orm.repository.RepositoryFactory;
 import org.panda_lang.orm.repository.RepositoryModel;
 import org.panda_lang.utilities.inject.Injector;
 
+import java.io.IOException;
+
 public final class CollectionFactory {
 
     private static final EntityFactory ENTITY_FACTORY = new EntityFactory();
@@ -39,7 +41,7 @@ public final class CollectionFactory {
             REPOSITORY_FACTORY.createRepositoryImplementation(controller, collection, repositoryModel);
 
             return collection;
-        } catch (CannotCompileException | NotFoundException e) {
+        } catch (CannotCompileException | NotFoundException | IOException | ReflectiveOperationException e) {
             throw new PandaOrmException("Cannot generate entity class", e);
         }
     }

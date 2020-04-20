@@ -16,13 +16,14 @@
 
 package org.panda_lang.orm.transaction;
 
+import org.panda_lang.orm.entity.DataEntity;
 import org.panda_lang.orm.repository.DataHandler;
 
 import java.util.Collections;
 
 public final class DefaultTransaction {
 
-    public static <T> DataTransaction of(DataHandler<T> handler, T entity, DataModification modification) {
+    public static <E extends DataEntity<E>> DataTransaction of(DataHandler<E> handler, E entity, DataModification modification) {
         return new Transaction<>(handler, entity, null, () -> Collections.singletonList(modification))
                 .retry((attempt, time) -> attempt < 10 && time < 5000);
     }

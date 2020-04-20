@@ -24,29 +24,39 @@ import org.panda_lang.orm.transaction.DataTransaction;
 import org.panda_lang.utilities.commons.ClassPoolUtils;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 final class EntityGeneratorConstants {
 
     protected static final CtClass CT_VOID;
     protected static final CtClass CT_OBJECT;
+    protected static final CtClass CT_STRING;
+    protected static final CtClass CT_COLLECTION;
     protected static final CtClass CT_ARRAY_LIST;
+    protected static final CtClass CT_HASHMAP;
     protected static final CtClass CT_ATOMIC_BOOLEAN;
     protected static final CtClass CT_RUNNABLE;
 
     protected static final CtClass CT_DATA_HANDLER;
     protected static final CtClass CT_DATA_TRANSACTION;
+    protected static final CtClass CT_PROPERTY_FIELD;
 
     static {
         try {
             CT_VOID = ClassPoolUtils.get(void.class);
             CT_OBJECT = ClassPoolUtils.get(Object.class);
+            CT_STRING = ClassPoolUtils.get(String.class);
+            CT_COLLECTION = ClassPoolUtils.get(Collection.class);
             CT_ARRAY_LIST = ClassPoolUtils.get(ArrayList.class);
+            CT_HASHMAP = ClassPoolUtils.get(HashMap.class);
             CT_ATOMIC_BOOLEAN = ClassPoolUtils.get(AtomicBoolean.class);
             CT_RUNNABLE = ClassPoolUtils.get(Runnable.class);
 
             CT_DATA_HANDLER = ClassPoolUtils.get(DataHandler.class);
             CT_DATA_TRANSACTION = ClassPoolUtils.get(DataTransaction.class);
+            CT_PROPERTY_FIELD = ClassPoolUtils.get(PropertyField.class);
         } catch (NotFoundException e) {
             throw new PandaOrmException("Class not found: " + e.getMessage());
         }

@@ -20,6 +20,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import io.vavr.control.Option;
 import org.panda_lang.orm.collection.CollectionModel;
 import org.panda_lang.orm.collection.DataCollection;
+import org.panda_lang.orm.entity.DataEntity;
 import org.panda_lang.orm.repository.DataController;
 import org.panda_lang.orm.serialization.Type;
 import org.panda_lang.orm.sql.queries.SqlUtils;
@@ -94,7 +95,7 @@ public final class DatabaseController implements DataController {
     }
 
     @Override
-    public <ENTITY> Option<TableHandler<ENTITY>> getHandler(String collection) {
+    public <ENTITY extends DataEntity<ENTITY>> Option<TableHandler<ENTITY>> getHandler(String collection) {
         return Option.of(ObjectUtils.cast(tables.get(collection)));
     }
 

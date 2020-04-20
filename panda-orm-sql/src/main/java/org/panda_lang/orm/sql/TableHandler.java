@@ -16,6 +16,7 @@
 
 package org.panda_lang.orm.sql;
 
+import org.panda_lang.orm.entity.DataEntity;
 import org.panda_lang.orm.entity.EntityModel;
 import org.panda_lang.orm.entity.MethodModel;
 import org.panda_lang.orm.properties.GenerationStrategy;
@@ -35,10 +36,11 @@ import org.panda_lang.utilities.commons.ObjectUtils;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-final class TableHandler<T> implements DataHandler<T> {
+final class TableHandler<T extends DataEntity<T>> implements DataHandler<T> {
 
     private final DatabaseController controller;
     private final Table table;
@@ -51,7 +53,7 @@ final class TableHandler<T> implements DataHandler<T> {
     @Override
     @SuppressWarnings({ "unchecked" })
     public T create(Object[] constructorArguments) throws Exception {
-        T value = (T) table.getCollection().getEntityClass()
+        T entity = (T) table.getCollection().getEntityClass()
                 .getConstructor(ArrayUtils.mergeArrays(ArrayUtils.of(DataHandler.class), ClassUtils.getClasses(constructorArguments)))
                 .newInstance(ArrayUtils.mergeArrays(new Object[] { this }, constructorArguments));
 
@@ -65,7 +67,7 @@ final class TableHandler<T> implements DataHandler<T> {
                     continue;
                 }
 
-                String fieldValue = column.serialize(getter.getMethod().invoke(value));
+                String fieldValue = column.serialize(getter.getMethod().invoke(entity));
 
                 if (fieldValue != null) {
                     insert.field(column.getName(), fieldValue);
@@ -79,7 +81,13 @@ final class TableHandler<T> implements DataHandler<T> {
             SqlUtils.consume(connection, "SELECT * FROM users;", result -> System.out.println("Remote user: " + result.getString("name")));
         }
 
-        return value;
+        entity.getPropertyFields().forEach(field -> {
+            if (field.getProperty().isForeign() && field.getProperty().isCollection()) {
+                field.set(entity, new ArrayList<>());
+            }
+        });
+
+        return entity;
     }
 
     @Override
@@ -90,20 +98,21 @@ final class TableHandler<T> implements DataHandler<T> {
     @Override
     public void save(DataTransactionResult<T> transaction) throws Exception {
         List<? extends DataModification> modifications = transaction.getModifications();
+        T entity = transaction.getEntity();
 
         try (Connection connection = controller.createConnection()) {
             UpdateQuery update = new UpdateQuery(table, modifications.size());
 
             for (DataModification modification : modifications) {
                 Column<?> column = table.getColumns().get(modification.getProperty());
-                String fieldValue = column.serialize(getEntityModel().getPropertyValue(transaction.getEntity(), modification.getProperty()));
+                String fieldValue = column.serialize(entity.getPropertyField(column.getName()).get(entity));
 
                 if (fieldValue != null) {
                     update.field(modification.getProperty(), fieldValue);
                 }
             }
 
-            PreparedStatement preparedStatement = update.toPreparedStatement(connection, getEntityModel(), transaction.getEntity());
+            PreparedStatement preparedStatement = update.toPreparedStatement(connection, transaction.getEntity());
             System.out.println(preparedStatement);
             preparedStatement.executeUpdate();
 

@@ -20,6 +20,8 @@ import javassist.CannotCompileException;
 import javassist.NotFoundException;
 import org.panda_lang.orm.repository.RepositoryModel;
 
+import java.io.IOException;
+
 public final class EntityFactory {
 
     private static final EntityModelLoader ENTITY_SCHEME_LOADER = new EntityModelLoader();
@@ -29,7 +31,7 @@ public final class EntityFactory {
         return ENTITY_SCHEME_LOADER.load(entityClass);
     }
 
-    public Class<? extends DataEntity> generateEntityClass(RepositoryModel scheme) throws CannotCompileException, NotFoundException {
+    public Class<? extends DataEntity> generateEntityClass(RepositoryModel scheme) throws CannotCompileException, NotFoundException, IOException, ReflectiveOperationException {
         return ENTITY_GENERATOR.generate(scheme);
     }
 
