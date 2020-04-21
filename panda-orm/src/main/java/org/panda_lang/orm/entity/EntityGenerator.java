@@ -83,7 +83,7 @@ final class EntityGenerator {
      */
 
     @SuppressWarnings("unchecked")
-    protected Class<? extends DataEntity> generate(RepositoryModel repositoryModel) throws NotFoundException, CannotCompileException, IOException, ReflectiveOperationException {
+    protected Class<? extends DataEntity<?>> generate(RepositoryModel repositoryModel) throws NotFoundException, CannotCompileException, IOException, ReflectiveOperationException {
         EntityModel entityModel = repositoryModel.getCollectionModel().getEntityModel();
         Class<?> entityInterface = entityModel.getEntityType();
 
@@ -92,7 +92,7 @@ final class EntityGenerator {
         }
 
         String name = entityInterface.getPackage().getName() + ".Controlled" + entityInterface.getSimpleName();
-        Optional<Class<? extends DataEntity>> loadedEntityClass = ClassUtils.forName(name);
+        Optional<Class<? extends DataEntity<?>>> loadedEntityClass = ClassUtils.forName(name);
 
         if (loadedEntityClass.isPresent()) {
             return loadedEntityClass.get();
@@ -111,7 +111,7 @@ final class EntityGenerator {
         generateImplementations(entityClass);
 
         entityClass.writeFile("./generated-entities/");
-        Class<? extends DataEntity> generatedClass = (Class<? extends DataEntity>) entityClass.toClass();
+        Class<? extends DataEntity<?>> generatedClass = (Class<? extends DataEntity<?>>) entityClass.toClass();
         generateEntityFields(entityModel, generatedClass);
 
         return generatedClass;
@@ -259,7 +259,7 @@ final class EntityGenerator {
                         "}"
                 );
 
-        runnableMethod.setModifiers(Modifier.PUBLIC);
+        runnableMethod.setModifiers(Modifier.PUBLIC | Modifier.SYNCHRONIZED);
         entityClass.addMethod(runnableMethod);
 
         LinkedHashMap<String, CtClass> parameters = new LinkedHashMap<>();

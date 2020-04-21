@@ -31,7 +31,6 @@ import org.panda_lang.orm.properties.Id;
 import org.panda_lang.orm.properties.Repository;
 import org.panda_lang.utilities.commons.UnsafeUtils;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
@@ -78,9 +77,8 @@ final class DatabaseControllerTest {
         System.out.println("Group: " + group.getName());
         System.out.println(group.getMembers());
 
-        group.getPropertyField("members").set(group, new ArrayList<>());
-        System.out.println(group.getPropertyField("members"));
-        System.out.println(group.getMembers());
+        user.setGroup(group);
+        System.out.println("User group: " + user.getGroup().getId());
     }
 
     @Repository
@@ -93,9 +91,8 @@ final class DatabaseControllerTest {
     @Entity
     public interface Group extends DataEntity<Group> {
 
-        @Association(name = "users", relation = Relation.MANY)
+        @Association(collection = "users", property = "group", relation = Relation.VIRTUAL)
         Collection<User> getMembers();
-        //void addMember(User member);
 
         void setName(String name);
         String getName();
@@ -109,7 +106,7 @@ final class DatabaseControllerTest {
     @Entity
     public interface User extends DataEntity<User> {
 
-        @Association(name = "groups", relation = Relation.DIRECT)
+        @Association(collection = "groups", relation = Relation.DIRECT)
         Group getGroup();
         void setGroup(Group group);
 

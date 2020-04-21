@@ -33,6 +33,7 @@ import org.panda_lang.orm.transaction.DataTransactionResult;
 import org.panda_lang.utilities.commons.ArrayUtils;
 import org.panda_lang.utilities.commons.ClassUtils;
 import org.panda_lang.utilities.commons.ObjectUtils;
+import org.panda_lang.utilities.commons.collection.Pair;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -105,10 +106,21 @@ final class TableHandler<T extends DataEntity<T>> implements DataHandler<T> {
 
             for (DataModification modification : modifications) {
                 Column<?> column = table.getColumns().get(modification.getProperty());
-                String fieldValue = column.serialize(entity.getPropertyField(column.getName()).get(entity));
+                Object value = entity.getPropertyField(column.getName()).get(entity);
+                String serialized;
 
-                if (fieldValue != null) {
-                    update.field(modification.getProperty(), fieldValue);
+                if (column.isForeign()) {
+                    Pair<Table, Column<?>> foreign = column.getReference().get().apply(controller);
+                    DataEntity<DataEntity<?>> foreignEntity = ObjectUtils.cast(value);
+                    value = foreignEntity.getPropertyField(foreign.getValue().getName()).get(foreignEntity);
+                    serialized = foreign.getValue().serialize(value);
+                }
+                else {
+                    serialized = column.serialize(entity.getPropertyField(column.getName()).get(entity));
+                }
+
+                if (serialized != null) {
+                    update.field(modification.getProperty(), serialized);
                 }
             }
 
@@ -116,7 +128,7 @@ final class TableHandler<T extends DataEntity<T>> implements DataHandler<T> {
             System.out.println(preparedStatement);
             preparedStatement.executeUpdate();
 
-            SqlUtils.consume(connection, "SELECT * FROM users;", result -> System.out.println("Remote user: " + result.getString("name")));
+            SqlUtils.consume(connection, "SELECT * FROM users;", result -> System.out.println("Remote user: " + result.getString("name") + "@" + result.getString("group")));
             transaction.getSuccessAction().ifPresent(action -> action.accept(0, 0));
         }
     }

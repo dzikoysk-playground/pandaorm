@@ -14,29 +14,14 @@
  * limitations under the License.
  */
 
-package org.panda_lang.orm.properties;
+package org.panda_lang.orm.entity;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+public final class Foreign<VALUE> {
 
-@Target({ ElementType.METHOD })
-@Retention(RetentionPolicy.RUNTIME)
-public @interface Association {
+    public volatile VALUE value;
 
-    String collection();
-
-    String property() default "";
-
-    Relation relation() default Relation.DIRECT;
-
-    enum Relation {
-
-        DIRECT,
-        MANY,
-        VIRTUAL
-
+    public VALUE getValue() {
+        return value;
     }
 
 }
