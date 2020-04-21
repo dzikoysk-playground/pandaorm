@@ -287,6 +287,9 @@ final class EntityGenerator {
 
         entityClass.addMethod(CtCode.of(new CtMethod(EntityGeneratorConstants.CT_COLLECTION, "getPropertyFields", new CtClass[0], entityClass))
                 .compile("return ($r) _FIELDS.values();"));
+
+        entityClass.addMethod(CtCode.of(new CtMethod(EntityGeneratorConstants.CT_STRING, "toString", new CtClass[0], entityClass))
+                .compile("return ($r) $0.asString();"));
     }
 
 }

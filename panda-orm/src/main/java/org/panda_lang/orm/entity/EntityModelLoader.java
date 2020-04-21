@@ -43,6 +43,10 @@ final class EntityModelLoader {
         Collection<MethodModel> methods = new ArrayList<>();
 
         for (Method method : entityClass.getDeclaredMethods()) {
+            if (method.getName().equals("asString")) {
+                continue;
+            }
+
             MethodModel schemeMethod = METHOD_LOADER.load(properties, method);
             methods.add(schemeMethod);
         }

@@ -28,4 +28,8 @@ public interface DataEntity<E extends DataEntity<?>> {
 
     <T> Collection<? extends PropertyField<E, T>> getPropertyFields();
 
+    default String asString() {
+        return getClass() + "@" + System.identityHashCode(this);
+    }
+
 }

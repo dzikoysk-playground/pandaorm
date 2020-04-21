@@ -20,7 +20,6 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.junit.jupiter.api.Test;
 import org.panda_lang.orm.PandaOrm;
-import org.panda_lang.orm.collection.DataCollection;
 import org.panda_lang.orm.entity.DataEntity;
 import org.panda_lang.orm.properties.As;
 import org.panda_lang.orm.properties.Association;
@@ -61,24 +60,20 @@ final class DatabaseControllerTest {
                     .append()
                 .collect();
 
-        DataCollection users = orm.getCollection("users");
-        UserRepository userRepository = users.getRepository(UserRepository.class);
+        UserRepository userRepository = orm.getCollection("users").getRepository(UserRepository.class);
+        GroupRepository groupRepository = orm.getCollection("groups").getRepository(GroupRepository.class);
 
         User user = userRepository.createUser("insertt");
-        System.out.println("User: " + user.getName());
+        System.out.println("User: " + user);
 
         user.setName("makub");
-        System.out.println("Updated user: " + user.getName());
-
-        DataCollection groups = orm.getCollection("groups");
-        GroupRepository groupRepository = groups.getRepository(GroupRepository.class);
+        System.out.println("Updated user: " + user);
 
         Group group = groupRepository.createGroup("natural born pranksters");
-        System.out.println("Group: " + group.getName());
-        System.out.println(group.getMembers());
+        System.out.println("Group: " + group);
 
         user.setGroup(group);
-        System.out.println("User group: " + user.getGroup().getId());
+        System.out.println("User group: " + user);
     }
 
     @Repository
@@ -101,6 +96,11 @@ final class DatabaseControllerTest {
         @Generated
         UUID getId();
 
+        @Override
+        default String asString() {
+            return "Group { id=" + getId() + ", name=" + getName() + ", members=" + getMembers() + " }";
+        }
+
     }
 
     @Entity
@@ -116,6 +116,11 @@ final class DatabaseControllerTest {
         @Id
         @Generated
         UUID getId();
+
+        @Override
+        default String asString() {
+            return "User { id=" + getId() + ", name=" + getName() + ", group=" + getGroup() + " }";
+        }
 
     }
 
