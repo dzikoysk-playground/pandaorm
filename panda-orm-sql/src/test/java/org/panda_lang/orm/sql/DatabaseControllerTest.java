@@ -76,17 +76,31 @@ final class DatabaseControllerTest {
         System.out.println("User group: " + user);
     }
 
-    @Repository
-    public interface GroupRepository extends SqlRepository<Group> {
+    @Entity
+    public interface User extends DataEntity<User> {
 
-        Group createGroup(@As("name") String name);
+        @Association(ref = "groups", relation = Relation.MANY_TO_ONE)
+        Group getGroup();
+        void setGroup(Group group);
+
+        void setName(String name);
+        String getName();
+
+        @Id
+        @Generated
+        UUID getId();
+
+        @Override
+        default String asString() {
+            return "User { id=" + getId() + ", name=" + getName() + ", group=" + getGroup() + " }";
+        }
 
     }
 
     @Entity
     public interface Group extends DataEntity<Group> {
 
-        @Association(collection = "users", property = "group", relation = Relation.VIRTUAL)
+        @Association(ref = "users:group", relation = Relation.ONE_TO_MANY)
         Collection<User> getMembers();
 
         void setName(String name);
@@ -103,24 +117,10 @@ final class DatabaseControllerTest {
 
     }
 
-    @Entity
-    public interface User extends DataEntity<User> {
+    @Repository
+    public interface GroupRepository extends SqlRepository<Group> {
 
-        @Association(collection = "groups", relation = Relation.DIRECT)
-        Group getGroup();
-        void setGroup(Group group);
-
-        void setName(String name);
-        String getName();
-
-        @Id
-        @Generated
-        UUID getId();
-
-        @Override
-        default String asString() {
-            return "User { id=" + getId() + ", name=" + getName() + ", group=" + getGroup() + " }";
-        }
+        Group createGroup(@As("name") String name);
 
     }
 

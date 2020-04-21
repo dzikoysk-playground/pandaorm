@@ -23,6 +23,7 @@ import org.panda_lang.orm.collection.DataCollection;
 import org.panda_lang.orm.collection.DataCollectionImpl;
 import org.panda_lang.orm.properties.Association;
 import org.panda_lang.orm.properties.Association.Relation;
+import org.panda_lang.orm.properties.AssociationUtils;
 import org.panda_lang.orm.properties.AutoIncrement;
 import org.panda_lang.orm.properties.Id;
 import org.panda_lang.orm.properties.NonNull;
@@ -83,20 +84,20 @@ final class EntityTableLoader {
             Association association = annotations.getAnnotation(Association.class).orElse(null);
 
             if (association != null) {
-                if (association.relation() == Relation.MANY) {
-                    Pair<String, String> content = new Pair<>(model.getName(), association.collection());
+                if (association.relation() == Relation.MANY_TO_MANY) {
+                    Pair<String, String> content = new Pair<>(model.getName(), association.ref());
                     associative.put(property.getName(), content);
                     return;
                 }
 
-                if (association.relation() == Relation.VIRTUAL) {
+                if (association.relation() == Relation.ONE_TO_MANY) {
                     return;
                 }
             }
 
             @Nullable Reference reference = association == null ? null : databaseController -> {
-                TableHandler<?> handler = databaseController.getHandler(association.collection()).getOrElseThrow(() -> {
-                    throw new PandaOrmException("Internal error: Unknown table " + association.collection()); // should never happen
+                TableHandler<?> handler = databaseController.getHandler(AssociationUtils.getCollection(association.ref())).getOrElseThrow(() -> {
+                    throw new PandaOrmException("Internal error: Unknown table " + association.relation()); // should never happen
                 });
 
                 return new Pair<>(handler.getTable(), handler.getTable().getPrimary());
@@ -109,8 +110,10 @@ final class EntityTableLoader {
             }
             else {
                 type = () -> {
-                    TableHandler<?> tableHandler = databaseController.getHandler(association.collection()).getOrElseThrow(() -> {
-                        throw new PandaOrmException("Internal error: Unknown table " + association.collection());
+                    String collectionName = AssociationUtils.getCollection(association.ref());
+
+                    TableHandler<?> tableHandler = databaseController.getHandler(collectionName).getOrElseThrow(() -> {
+                        throw new PandaOrmException("Internal error: Unknown table " + collectionName);
                     });
 
                     return tableHandler.getTable().getPrimary().getType();

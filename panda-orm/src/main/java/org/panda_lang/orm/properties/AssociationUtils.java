@@ -16,26 +16,28 @@
 
 package org.panda_lang.orm.properties;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+public final class AssociationUtils {
 
-@Target({ ElementType.METHOD })
-@Retention(RetentionPolicy.RUNTIME)
-public @interface Association {
+    private AssociationUtils() { }
 
-    String ref() default "";
+    public static String getCollection(String ref) {
+        String[] content = ref.split(":");
 
-    Relation relation() default Relation.ONE_TO_ONE;
+        if (content.length == 1) {
+            return ref;
+        }
 
-    enum Relation {
+        return content[0];
+    }
 
-        ONE_TO_ONE,
-        MANY_TO_MANY,
-        ONE_TO_MANY,
-        MANY_TO_ONE
+    public static String getProperty(String ref) {
+        String[] content = ref.split(":");
 
+        if (content.length == 1) {
+            return "";
+        }
+
+        return content[1];
     }
 
 }
