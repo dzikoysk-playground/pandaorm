@@ -3,7 +3,7 @@ Object-Relational Mapping extracted from [Panda](https://github.com/panda-lang/p
 
 #### Supported databases
 - [x] InMemory database
-- [ ] SQL databases
+- [x] SQL databases (without relations)
 - [ ] NoSQL databases
 
 #### Supported layers
